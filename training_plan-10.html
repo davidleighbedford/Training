@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>Power Plan</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0a0a0f;--sur:#13131a;--sur2:#1c1c26;--brd:#2a2a3a;--txt:#e8e8f0;--mut:#7070a0;--cy:#f5a623;--run:#4fc3f7;--kb:#a78bfa;--ok:#4ade80;--z2:#4ade80;--z3:#facc15;--z4:#f97316;--z5:#ef4444}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--txt);font-family:'DM Sans',sans-serif;font-size:15px;line-height:1.5;overflow-x:hidden}
+.page{display:none;min-height:100vh}.page.active{display:block}
+.hdr{background:linear-gradient(160deg,#1a1a2e,#0a0a0f 60%);padding:36px 20px 24px;position:relative;overflow:hidden;border-bottom:1px solid var(--brd)}
+.hdr::before{content:'';position:absolute;top:-60px;right:-60px;width:200px;height:200px;background:radial-gradient(circle,rgba(245,166,35,.12),transparent 70%);border-radius:50%}
+.htag{font-family:'DM Mono',monospace;font-size:11px;color:var(--cy);letter-spacing:3px;text-transform:uppercase;margin-bottom:8px}
+.hdr h1{font-family:'Bebas Neue',sans-serif;font-size:48px;line-height:.95;letter-spacing:2px;margin-bottom:10px}
+.hdr h1 span{color:var(--cy)}
+.hmeta{display:flex;gap:14px;flex-wrap:wrap;font-size:11px;color:var(--mut);font-family:'DM Mono',monospace}
+.hmeta span{color:var(--txt)}
+.sec{padding:22px 20px 8px}.pb{padding-bottom:50px}
+.stitle{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:2px;margin-bottom:14px;display:flex;align-items:center;gap:10px}
+.stitle::after{content:'';flex:1;height:1px;background:var(--brd)}
+.pctx{background:var(--sur2);border:1px solid var(--brd);border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:var(--mut);transition:all .3s}
+.pctx strong{color:var(--txt);display:block;font-size:13px;margin-bottom:3px}
+.zdeck{position:relative;overflow:hidden;border-radius:14px;touch-action:pan-y}
+.ztrack{display:flex;transition:transform .35s cubic-bezier(.4,0,.2,1)}
+.zslide{min-width:100%;background:var(--sur);border:1px solid var(--brd);border-radius:14px;padding:16px}
+.zs-title{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--mut);text-transform:uppercase;display:flex;align-items:center;gap:6px;margin-bottom:12px}
+.zs-title .dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.zrow{display:flex;align-items:center;gap:8px;margin-bottom:9px}
+.zlbl{font-family:'DM Mono',monospace;font-size:12px;font-weight:600;width:32px;flex-shrink:0}
+.zbw{flex:1;height:9px;background:var(--sur2);border-radius:5px;overflow:hidden}
+.zb{height:100%;border-radius:5px;transition:width .5s ease}
+.zval{font-family:'DM Mono',monospace;font-size:11px;color:var(--mut);min-width:100px;text-align:right}
+.ztiz{font-family:'DM Mono',monospace;font-size:10px;padding:2px 7px;border-radius:12px;background:var(--sur2);border:1px solid var(--brd);transition:all .4s;white-space:nowrap;min-width:34px;text-align:center}
+.ztiz.on{border-color:transparent;color:#000;font-weight:600}
+.zdots{display:flex;gap:6px;align-items:center;justify-content:center;margin-top:12px}
+.zdot{width:7px;height:7px;border-radius:50%;background:var(--brd);cursor:pointer;transition:all .2s}
+.zdot.active{background:var(--cy);width:18px;border-radius:4px}
+.zhint{text-align:center;font-family:'DM Mono',monospace;font-size:9px;color:var(--mut);margin-top:6px;letter-spacing:1px}
+.ftpbox{background:linear-gradient(135deg,rgba(245,166,35,.1),rgba(245,166,35,.03));border:1px solid rgba(245,166,35,.3);border-radius:14px;padding:16px;margin-bottom:12px}
+.ftplbl{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--cy);text-transform:uppercase;margin-bottom:6px}
+.ftprow{display:flex;align-items:center;gap:12px;margin-bottom:5px}
+.ftpn{font-family:'Bebas Neue',sans-serif;font-size:42px;line-height:1}
+.ftpa{font-size:22px;color:var(--cy)}.ftpt{font-family:'Bebas Neue',sans-serif;font-size:42px;line-height:1;color:var(--cy)}
+.ftpu{font-family:'DM Mono',monospace;font-size:12px;color:var(--mut);align-self:flex-end;padding-bottom:5px}
+.ftpbar{width:100%;height:6px;background:var(--sur2);border-radius:3px;overflow:hidden;margin-top:8px}
+.ftpprog{height:100%;width:47%;background:linear-gradient(90deg,var(--z3),var(--cy));border-radius:3px}
+.ptabs{display:flex;gap:6px;margin-bottom:14px}
+.ptab{flex:1;background:var(--sur);border:1px solid var(--brd);border-radius:10px;padding:9px 4px;text-align:center;cursor:pointer;transition:all .2s}
+.ptab.active{background:var(--sur2);border-color:var(--cy)}
+.ptab-n{font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:1px;display:block}
+.ptab-w{font-family:'DM Mono',monospace;font-size:9px;color:var(--mut)}
+.ptab.active .ptab-n{color:var(--cy)}
+.pcont{display:none}.pcont.active{display:block}
+.wnav{display:flex;gap:8px;margin-bottom:14px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}
+.wnav::-webkit-scrollbar{display:none}
+.wbtn{background:var(--sur);border:1px solid var(--brd);color:var(--mut);border-radius:20px;padding:6px 15px;font-family:'DM Mono',monospace;font-size:12px;cursor:pointer;white-space:nowrap;transition:all .2s;flex-shrink:0}
+.wbtn.active{background:var(--cy);border-color:var(--cy);color:#000;font-weight:700}
+.wcont{display:none}.wcont.active{display:block}
+.dcard{background:var(--sur);border:1px solid var(--brd);border-radius:14px;margin-bottom:10px;overflow:hidden}
+.dhead{display:flex;align-items:center;padding:13px 16px;cursor:pointer;gap:12px}
+.dname{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:1px;flex:1}
+.dtag{font-family:'DM Mono',monospace;font-size:10px;padding:3px 10px;border-radius:20px;font-weight:600;letter-spacing:.5px}
+.tc{background:rgba(245,166,35,.15);color:var(--cy);border:1px solid rgba(245,166,35,.3)}
+.tr{background:rgba(79,195,247,.15);color:var(--run);border:1px solid rgba(79,195,247,.3)}
+.tx{background:rgba(74,222,128,.1);color:var(--ok);border:1px solid rgba(74,222,128,.2)}
+.tm{background:rgba(245,166,35,.1);color:var(--cy);border:1px solid rgba(245,166,35,.2)}
+.chv{color:var(--mut);font-size:17px;transition:transform .25s;line-height:1;flex-shrink:0}
+.dcard.open .chv{transform:rotate(180deg)}
+.dbody{display:none;padding:0 15px 15px;border-top:1px solid var(--brd)}
+.dcard.open .dbody{display:block}
+.sb{margin-top:13px}
+.sdesc{font-size:12px;color:var(--mut);line-height:1.6}
+.stype{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--mut);text-transform:uppercase;margin-bottom:7px}
+.stit{font-size:14px;font-weight:600;margin-bottom:5px}
+.steps{list-style:none}
+.step{display:flex;gap:9px;margin-bottom:7px;font-size:12px}
+.sn{font-family:'DM Mono',monospace;font-size:11px;color:var(--cy);font-weight:600;min-width:46px;padding-top:1px}
+.st{color:var(--txt);line-height:1.5}.hr{color:var(--run)}.pw{color:var(--cy)}
+.divl{height:1px;background:var(--brd);margin:12px 0}
+.note{background:var(--sur2);border-left:3px solid var(--cy);border-radius:0 8px 8px 0;padding:10px 13px;font-size:12px;color:var(--mut);line-height:1.5;margin:9px 0}
+.note strong{color:var(--txt)}
+.tchart{margin:12px 0;background:var(--sur2);border:1px solid var(--brd);border-radius:12px;padding:12px 12px 10px;overflow:hidden}
+.tchart-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;gap:8px}
+.tchart-t{font-family:'DM Mono',monospace;font-size:10px;color:var(--mut);letter-spacing:1px;text-transform:uppercase;line-height:1.3}
+.tchart-tm{font-family:'DM Mono',monospace;font-size:11px;color:var(--cy);font-weight:600;white-space:nowrap;flex-shrink:0}
+.tchart-bars{display:flex;align-items:flex-end;gap:2px;height:80px;width:100%}
+.tb-col{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;min-width:0}
+.tb-bar{width:100%;border-radius:3px 3px 0 0;min-height:3px}
+.tb-lbl{font-family:'DM Mono',monospace;font-size:7px;color:var(--mut);margin-top:3px;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.tchart-leg{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.tleg{display:flex;align-items:center;gap:4px;font-family:'DM Mono',monospace;font-size:10px;color:var(--mut)}
+.tleg-d{width:8px;height:8px;border-radius:2px;flex-shrink:0}
+.mrow{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:12px}
+.mc{background:var(--sur);border:1px solid var(--brd);border-radius:12px;padding:13px 10px;text-align:center}
+.mv{font-family:'Bebas Neue',sans-serif;font-size:26px;line-height:1;color:var(--cy);display:block;margin-bottom:3px}
+.ml{font-family:'DM Mono',monospace;font-size:9px;color:var(--mut);letter-spacing:1px}
+.kbl{display:flex;align-items:center;justify-content:space-between;background:rgba(167,139,250,.1);border:1px solid rgba(167,139,250,.3);border-radius:12px;padding:12px 15px;margin:9px 0;cursor:pointer;transition:all .2s}
+.kbl-t{font-size:13px;font-weight:600;color:var(--kb)}
+.kbl-s{font-family:'DM Mono',monospace;font-size:10px;color:var(--mut);margin-top:2px}
+.kbl-a{font-size:20px;color:var(--kb)}
+.kb-back{display:flex;align-items:center;gap:8px;padding:14px 20px;cursor:pointer;border-bottom:1px solid var(--brd);font-family:'DM Mono',monospace;font-size:12px;color:var(--mut)}
+.kb-cw{background:var(--sur);border:1px solid var(--brd);border-radius:14px;margin:0 16px 12px;overflow:hidden}
+.kct-hd{display:flex;align-items:center;padding:14px 16px;cursor:pointer;gap:10px}
+.kct-nm{font-family:'Bebas Neue',sans-serif;font-size:21px;letter-spacing:1px;flex:1;color:var(--kb)}
+.kct-sb{font-family:'DM Mono',monospace;font-size:10px;color:var(--mut)}
+.kct-bd{display:none;padding:0 12px 14px;border-top:1px solid var(--brd)}
+.kct-bd.open{display:block}
+.kbex{background:var(--sur2);border:1px solid var(--brd);border-radius:12px;padding:12px;margin-top:12px}
+.kbnm{font-size:14px;font-weight:600;margin-bottom:2px}
+.kbst{font-family:'DM Mono',monospace;font-size:11px;color:var(--kb);margin-bottom:8px}
+.kbtp{font-size:12px;color:var(--mut);line-height:1.45;margin-top:8px}
+.wtbl{display:grid;grid-template-columns:76px 1fr;gap:1px;background:var(--brd);border-radius:12px;overflow:hidden;margin-top:12px}
+.wt{background:var(--sur);padding:9px 12px}
+.wt.d{font-family:'DM Mono',monospace;font-size:11px;color:var(--mut)}
+
+.exrow{background:var(--sur);border:1px solid var(--brd);border-radius:14px;padding:0;margin-top:14px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.25)}
+.exrow-head{display:flex;align-items:center;gap:11px;padding:13px 14px;background:linear-gradient(90deg,rgba(167,139,250,.14),rgba(167,139,250,.04));border-bottom:1px solid var(--brd)}
+.exnum{font-family:'Bebas Neue',sans-serif;font-size:20px;line-height:1;color:#000;background:var(--kb);min-width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.exnm{font-size:15px;font-weight:600;flex:1}
+.exkit{font-family:'DM Mono',monospace;font-size:9px;padding:4px 9px;border-radius:20px;background:rgba(167,139,250,.2);color:var(--kb);white-space:nowrap;font-weight:600;letter-spacing:.5px}
+.exkit.bw{background:rgba(79,195,247,.2);color:var(--run)}
+.exbody{padding:13px 14px 14px}
+.exsets{font-family:'DM Mono',monospace;font-size:11px;color:var(--cy);font-weight:600;margin-bottom:10px;display:inline-block;padding:3px 9px;background:rgba(245,166,35,.1);border-radius:6px}
+.exhow{font-size:12.5px;color:var(--txt);line-height:1.55}
+.excue{font-size:11.5px;color:var(--txt);margin-top:11px;padding:8px 11px;background:rgba(245,166,35,.08);border-left:3px solid var(--cy);border-radius:0 8px 8px 0;line-height:1.5}
+.exwhy{font-size:11.5px;color:var(--mut);margin-top:10px;padding-top:10px;border-top:1px dashed var(--brd);font-style:italic;line-height:1.5}
+.timer{background:var(--sur);border:1px solid var(--brd);border-radius:14px;margin:14px 0;padding:14px;text-align:center}
+.timer-title{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--mut);text-transform:uppercase;margin-bottom:10px}
+.timer-phase{font-family:'Bebas Neue',sans-serif;font-size:30px;letter-spacing:1px;line-height:1;margin-bottom:4px;transition:color .2s}
+.timer-count{font-family:'DM Mono',monospace;font-size:42px;font-weight:500;line-height:1;margin-bottom:10px}
+.timer-track{height:14px;background:var(--sur2);border-radius:7px;overflow:hidden;margin-bottom:6px}
+.timer-fill{height:100%;width:100%;border-radius:7px;transition:width .25s linear,background .2s}
+.timer-meta{font-family:'DM Mono',monospace;font-size:10px;color:var(--mut);margin-bottom:12px}
+.timer-btns{display:flex;gap:8px;justify-content:center}
+.timer-btn{flex:1;max-width:120px;background:var(--sur2);border:1px solid var(--brd);color:var(--txt);border-radius:10px;padding:10px;font-family:'DM Mono',monospace;font-size:12px;font-weight:600;cursor:pointer;transition:all .15s}
+.timer-btn.go{background:var(--cy);border-color:var(--cy);color:#000}
+.timer-btn:active{transform:scale(.97)}
+
+/* circuit player */
+.player{padding:12px;border-bottom:1px solid var(--brd)}
+.cdeck{position:relative;overflow:hidden;border-radius:14px}
+.ctrack{display:flex;transition:transform .35s cubic-bezier(.4,0,.2,1)}
+.cslide{min-width:100%;padding:3px}
+/* exercise card with border-drain */
+.exrow{position:relative;background:var(--sur);border:1px solid var(--brd);border-radius:14px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.25)}
+.exborder{position:absolute;inset:0;border-radius:14px;padding:3px;pointer-events:none;z-index:2;
+  background:conic-gradient(var(--cy) 0deg, transparent 0deg);
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor;mask-composite:exclude;opacity:0;transition:opacity .2s}
+.exrow.active .exborder{opacity:1}
+.exrow-head{display:flex;align-items:center;gap:11px;padding:13px 14px;background:linear-gradient(90deg,rgba(167,139,250,.14),rgba(167,139,250,.04));border-bottom:1px solid var(--brd);position:relative;z-index:1}
+.exbody{padding:13px 14px 14px;position:relative;z-index:1}
+/* live phase readout on active card */
+.exlive{display:none;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px;padding:8px 11px;border-radius:10px;background:var(--sur2)}
+.exrow.active .exlive{display:flex}
+.exlive-ph{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;line-height:1}
+.exlive-ct{font-family:'DM Mono',monospace;font-size:26px;font-weight:500;line-height:1}
+.exlive-sets{font-family:'DM Mono',monospace;font-size:11px;color:var(--mut)}
+.exlive-sets b{color:var(--txt);font-size:15px}
+/* controls */
+.cdots{display:flex;gap:5px;align-items:center;justify-content:center;margin:12px 0 4px}
+.cdot{width:7px;height:7px;border-radius:50%;background:var(--brd);transition:all .2s}
+.cdot.active{background:var(--kb);width:18px;border-radius:4px}
+.cdot.done{background:var(--ok)}
+.cbar-wrap{margin:10px 4px 4px}
+.cbar-lbl{font-family:'DM Mono',monospace;font-size:9px;color:var(--mut);letter-spacing:1px;text-transform:uppercase;margin-bottom:5px;display:flex;justify-content:space-between}
+.cbar{height:12px;background:var(--sur2);border-radius:6px;overflow:hidden}
+.cbar-fill{height:100%;width:0%;border-radius:6px;background:var(--cy);transition:width .25s linear,background .2s}
+.cbtns{display:flex;gap:7px;margin-top:12px}
+.cbtn{flex:1;background:var(--sur2);border:1px solid var(--brd);color:var(--txt);border-radius:10px;padding:11px 4px;font-family:'DM Mono',monospace;font-size:12px;font-weight:600;cursor:pointer;transition:all .12s;text-align:center}
+.cbtn.go{background:var(--kb);border-color:var(--kb);color:#000;flex:1.6}
+.cbtn.nav{max-width:48px;font-size:16px}
+.cbtn:active{transform:scale(.96)}
+.chint{text-align:center;font-family:'DM Mono',monospace;font-size:9px;color:var(--mut);margin-top:8px;letter-spacing:1px}
+
+.cbar{position:relative;height:16px;background:var(--sur2);border-radius:6px;overflow:hidden}
+.cbar-fill{display:flex;height:100%;width:100%;border-radius:6px;overflow:hidden}
+.cbar-fill>div{transition:opacity .2s}
+.cbar-head{position:absolute;top:-2px;width:3px;height:20px;background:#fff;border-radius:2px;left:0%;transition:left .15s linear;box-shadow:0 0 6px rgba(255,255,255,.8);z-index:3}
+.cbar-leg{display:flex;gap:12px;justify-content:center;margin-top:7px}
+</style>
+<meta name="theme-color" content="#0a0a0f">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Power Plan">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' rx='40' fill='%230a0a0f'/%3E%3Ctext x='90' y='118' font-family='Arial' font-size='90' font-weight='bold' text-anchor='middle' fill='%23f5a623'%3EP%3C/text%3E%3C/svg%3E">
+<link rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%20%22Power%20Plan%22%2C%20%22short_name%22%3A%20%22Power%20Plan%22%2C%20%22start_url%22%3A%20%22.%22%2C%20%22display%22%3A%20%22standalone%22%2C%20%22background_color%22%3A%20%22%230a0a0f%22%2C%20%22theme_color%22%3A%20%22%230a0a0f%22%2C%20%22icons%22%3A%20%5B%7B%22src%22%3A%20%22data%3Aimage/svg%2Bxml%2C%253Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%20180%20180%27%253E%253Crect%20width%3D%27180%27%20height%3D%27180%27%20rx%3D%2740%27%20fill%3D%27%25230a0a0f%27/%253E%253Ctext%20x%3D%2790%27%20y%3D%27118%27%20font-family%3D%27Arial%27%20font-size%3D%2790%27%20font-weight%3D%27bold%27%20text-anchor%3D%27middle%27%20fill%3D%27%2523f5a623%27%253EP%253C/text%253E%253C/svg%253E%22%2C%20%22sizes%22%3A%20%22any%22%2C%20%22type%22%3A%20%22image/svg%2Bxml%22%7D%5D%7D">
+</head>
+<body>
+<div class="page active" id="pg-main">
+<div class="hdr">
+  <div class="htag">Personalised Training Plan</div>
+  <h1>POWER<br><span>PLAN</span></h1>
+  <div class="hmeta">FTP <span>~222W</span> &nbsp;&rarr;&nbsp; TARGET <span>245W</span> &nbsp;&middot;&nbsp; THR HR <span>179bpm</span></div>
+</div>
+<div class="sec">
+  <div class="stitle" style="color:var(--cy)">ZONES</div>
+  <div id="pctx" class="pctx"><strong>Overview</strong>Select a phase below to see typical time-in-zone targets for each discipline.</div>
+  <div class="zdeck" id="zdeck">
+    <div class="ztrack" id="ztrack">
+      <div class="zslide">
+        <div class="zs-title"><span class="dot" style="background:var(--cy)"></span>CYCLING &middot; HEART RATE</div>
+        <div class="zrow"><span class="zlbl" style="color:var(--z2)">Z2</span><div class="zbw"><div class="zb" id="hrz2b" style="background:var(--z2);width:50%"></div></div><span class="zval">&lt;145 bpm</span><span class="ztiz" id="hrz2t">&mdash;</span></div><div class="zrow"><span class="zlbl" style="color:var(--z3)">Z3</span><div class="zbw"><div class="zb" id="hrz3b" style="background:var(--z3);width:50%"></div></div><span class="zval">145&ndash;162</span><span class="ztiz" id="hrz3t">&mdash;</span></div><div class="zrow"><span class="zlbl" style="color:var(--z4)">Z4</span><div class="zbw"><div class="zb" id="hrz4b" style="background:var(--z4);width:50%"></div></div><span class="zval">163&ndash;179</span><span class="ztiz" id="hrz4t">&mdash;</span></div><div class="zrow"><span class="zlbl" style="color:var(--z5)">Z5</span><div class="zbw"><div class="zb" id="hrz5b" style="background:var(--z5);width:50%"></div></div><span class="zval">&gt;179 bpm</span><span class="ztiz" id="hrz5t">&mdash;</span></div>
+      </div>
+      <div class="zslide">
+        <div class="zs-title"><span class="dot" style="background:var(--cy)"></span>CYCLING &middot; POWER (FTP ~222W)</div>
+        <div class="zrow"><span class="zlbl" style="color:var(--z2)">Z2</span><div class="zbw"><div class="zb" id="pwz2b" style="background:var(--z2);width:50%"></div></div><span class="zval">&lt;167W</span><span class="ztiz" id="pwz2t">&mdash;</span></div><div class="zrow"><span class="zlbl" style="color:var(--z3)">SS</span><div class="zbw"><div class="zb" id="pwz3b" style="background:var(--z3);width:50%"></div></div><span class="zval">189&ndash;211W</span><span class="ztiz" id="pwz3t">&mdash;</span></div><div class="zrow"><span class="zlbl" style="color:var(--z4)">THR</span><div class="zbw"><div class="zb" id="pwz4b" style="background:var(--z4);width:50%"></div></div><span class="zval">211&ndash;244W</span><span class="ztiz" id="pwz4t">&mdash;</span></div><div class="zrow"><span class="zlbl" style="color:var(--z5)">VO2</span><div class="zbw"><div class="zb" id="pwz5b" style="background:var(--z5);width:50%"></div></div><span class="zval">&gt;244W</span><span class="ztiz" id="pwz5t">&mdash;</span></div>
+      </div>
+      <div class="zslide">
+        <div class="zs-title"><span class="dot" style="background:var(--run)"></span>RUNNING &middot; PACE &amp; HR</div>
+        <div class="zrow"><span class="zlbl" style="color:var(--z2)">EZ</span><div class="zbw"><div class="zb" id="rnz2b" style="background:var(--z2);width:50%"></div></div><span class="zval">6:00&ndash;6:30 &middot; &lt;155</span><span class="ztiz" id="rnz2t">&mdash;</span></div><div class="zrow"><span class="zlbl" style="color:var(--z3)">TMP</span><div class="zbw"><div class="zb" id="rnz3b" style="background:var(--z3);width:50%"></div></div><span class="zval">5:20&ndash;5:45</span><span class="ztiz" id="rnz3t">&mdash;</span></div><div class="zrow"><span class="zlbl" style="color:var(--z4)">THR</span><div class="zbw"><div class="zb" id="rnz4b" style="background:var(--z4);width:50%"></div></div><span class="zval">~5:00 &middot; 170+</span><span class="ztiz" id="rnz4t">&mdash;</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="zdots"><div class="zdot active" onclick="goSlide(0)"></div><div class="zdot" onclick="goSlide(1)"></div><div class="zdot" onclick="goSlide(2)"></div></div>
+  <div class="zhint">&#8592; swipe or tap dots &#8594;</div>
+</div>
+<div class="sec">
+  <div class="stitle" style="color:var(--cy)">GOAL</div>
+  <div class="ftpbox">
+    <div class="ftplbl">FTP TARGET &middot; AUTUMN 2026</div>
+    <div class="ftprow"><span class="ftpn">222</span><span class="ftpa">&rarr;</span><span class="ftpt">245</span><span class="ftpu">WATTS</span></div>
+    <div style="font-size:12px;color:var(--mut)">+23W over the 13-week plan, then retest and repeat</div>
+    
+  </div>
+</div>
+<div class="sec pb">
+  <div class="stitle" style="color:var(--cy)">PHASES</div>
+  <div class="ptabs">
+    <div class="ptab active" onclick="switchPhase('build',this)"><span class="ptab-n">BUILD</span><span class="ptab-w">Wks 1&ndash;4</span></div>
+    <div class="ptab" onclick="switchPhase('develop',this)"><span class="ptab-n">DEVELOP</span><span class="ptab-w">Wks 5&ndash;8</span></div>
+    <div class="ptab" onclick="switchPhase('peak',this)"><span class="ptab-n">PEAK</span><span class="ptab-w">Wks 9&ndash;12</span></div>
+    <div class="ptab" onclick="switchPhase('recover',this)"><span class="ptab-n">RECOVER</span><span class="ptab-w">Wk 13</span></div>
+  </div>
+  <div class="pcont active" id="ph-build"><div class="note" style="border-color:var(--run)"><strong>About your commute:</strong> Your commute is ~40&ndash;45 min each way and the route naturally sits at a tempo effort. That is already a solid aerobic/Z3 load twice a day &mdash; so the added intensity below is deliberately selective. On easy days, just ride the commute relaxed rather than fighting to stay in Z2.</div><div class="note"><strong>Build Phase:</strong> Re-establish aerobic base. Commutes Z2. Sweet spot enters week 3. Run easy. KB Circuit A weeks 1&ndash;2, Circuit B weeks 3&ndash;4.</div><div class="kbl" onclick="goKB('A');"><div><div class="kbl-t">&#127947; KB Circuit A &mdash; Foundation</div><div class="kbl-s">Weeks 1&ndash;2 &middot; 2 rounds &middot; 40s on / 20s rest</div></div><span class="kbl-a">&rsaquo;</span></div><div class="wnav"><button class="wbtn active" onclick="switchWeek('b1',this,'build')">Week 1</button><button class="wbtn" onclick="switchWeek('b2',this,'build')">Week 2</button><button class="wbtn" onclick="switchWeek('b3',this,'build')">Week 3</button><button class="wbtn" onclick="switchWeek('b4',this,'build')">Week 4</button></div><div class="wcont active" id="wk-b1"><div class="dcard" onclick="toggleDay(this)"><div class="dhead"><span class="dname">MONDAY</span><span class="dtag tx">REST</span><span class="chv">&#8964;</span></div><div class="dbody"><div class="sb"><div class="sdesc">Full rest. Light stretching only.</div></div></div></div><div class="dcard" onclick="toggleDay(this)"><div class="dhead"><span class="dname">TUESDAY</span><span class="dtag tm">COMMUTE + KB</span><span class="chv">&#8964;</span></div><div class="dbody"><div class="sb"><div class="stype">&#128692; COMMUTE &middot; HR BASED</div><div class="stit">Z2 Both Ways</div><div data-chart="tc-tu-b1-am"></div><div data-chart="tc-tu-b1-pm"></div><ul class="steps"><li class="step"><span class="sn">AM</span><span class="st">Morning <span class="hr">Brixton &rarr; Epsom</span>: <span class="hr">Z2 &lt;145bpm</span>. High cadence 90+ rpm.</span></li><li class="step"><span class="sn">PM</span><span class="st">Afternoon <span class="hr">Epsom &rarr; Brixton</span>: <span class="hr">Z2 &lt;145bpm</span>. Stay relaxed.</span></li></ul></div><div class="divl"></div><div class="sb"><div class="stype">&#127947; KETTLEBELL EVENING</div><div class="kbl" onclick="goKB('A');event.stopPropagation()"><div><div class="kbl-t">Circuit A &mdash; Foundation</div><div class="kbl-s">Goblet Squat &middot; Deadlift &middot; Halo &middot; Glute Bridge</div></div><span class="kbl-a">&rsaquo;</span></div></div></div></div><div class="dcard" onclick="toggleDay(this)"><div class="dhead"><span class="dname">WEDNESDAY</span><span class="dtag tx">REST</span><span class="chv">&#8964;</span></div><div class="dbody"><div class="sb"><div class="sdesc">Recovery. Optional easy walk. No cycling.</div></div></div></div><div class="dcard" onclick="toggleDay(this)"><div class="dhead"><span class="dname">THURSDAY</span><span class="dtag tm">COMMUTE + KB</span><span class="chv">&#8964;</span></div><div class="dbody"><div class="sb"><div class="stype">&#128692; COMMUTE &middot; HR BASED</div><div class="stit">Easy In / Tempo Out</div><div data-chart="tc-th-b1-am"></div><div data-chart="tc-th-b1-pm"></div><ul class="steps"><li class="step"><span class="sn">AM</span><span class="st">Morning <span class="hr">Brixton &rarr; Epsom</span>: <span class="hr">Z2 &lt;145bpm</span> all the way.</span></li><li class="step"><span class="sn">PM</span><span class="st">Afternoon <span class="hr">Epsom &rarr; Brixton</span>: one 5 min clear stretch at <span class="hr">155&ndash;162bpm (Z3)</span>. Rest Z2.</span></li></ul></div><div class="divl"></div><div class="sb"><div class="stype">&#127947; KETTLEBELL EVENING</div><div class="kbl" onclick="goKB('A');event.stopPropagation()"><div><div class="kbl-t">Circuit A &mdash; Foundation</div><div class="kbl-s">Goblet Squat &middot; Deadlift &middot; Halo &middot; Glute Bridge</div></div><span class="kbl-a">&rsaquo;</span></div></div></div></div><div class="dcard" onclick="toggleDay(this)"><div class="dhead"><span class="dname">FRIDAY</span><span class="dtag tx">REST</span><span class="chv">&#8964;</span></div><div class="dbody"><div class="sb"><div class="sdesc">Rest before weekend ride. Light mobility.</div></div></div></div><div class="dcard" onclick="toggleDay(this)"><div class="dhead"><span class="dname">SATURDAY</span><span class="dtag tc">RIDE &middot; POWER</span><span class="chv">&#8964;</span></div><div class="dbody"><div class="sb"><div class="stype">&#128692; WEEKEND RIDE &middot; POWER METER</div><div class="stit">Aerobic Base &mdash; 2 hrs</div><div data-chart="tc-sat-w1"></div><ul class="steps"><li class="step"><span class="sn">WU</span><span class="st">Warm up 15 min: <span class="pw">&lt;150W</span></span></li><li class="step"><span class="sn">MAIN</span><span class="st">90 min: <span class="pw">140&ndash;167W</span>. If HR &gt;155bpm, ease off.</span></li><li class="step"><span class="sn">CD</span><span class="st">Cool down 15 min: <span class="pw">&lt;130W</span></span></li></ul></div></div></div><div class="dcard" onclick="toggleDay(this)"><div class="dhead"><span class="dname">SUNDAY</span><span class="dtag tr">RUN</span><span class="chv">&#8964;</span></div><div class="dbody"><div class="sb"><div class="stype">&#127939; RUN</div><div class="stit">Easy 5km</div><div data-chart="tc-sun-w1"></div><ul class="steps"><li class="step"><span class="sn">RUN</span><span class="st">5km at <span class="hr">6:00&ndash;6:30/km</span>, HR &lt;155bpm</span></li><li class="step"><span class="sn">STR</span><span class="st">5 min stretch: hips, calves, hamstrings</span></li></ul></div></div></div></div><div class="wcont" id="wk-b2"><div class="dcard" onclick="toggleDay(this)"><div class="dhead"><span class="dname">MONDAY</span><span class="dtag tx">REST</span><span class="chv">&#8964;</span></div><div class="dbody"><div class="sb"><div class="sdesc">Full rest. Light stretching only.</div></div></div></div><div class="dcard" onclick="toggleDay(this)"><div class="dhead"><span class="dname">TUESDAY</span><span class="dtag tm">COMMUTE + KB</span><span class="chv">&#8964;</span></div><div class="dbody"><div class="sb"><div class="stype">&#128692; COMMUTE &middot; HR BASED</div><div class="stit">Z2 Both Ways</div><div data-chart="tc-tu-b2-am"></div><div data-chart="tc-tu-b2-pm"></div><ul class="steps"><li class="step"><span class="sn">AM</span><span class="st">Morning <span class="hr">Brixton &rarr; Epsom</span>: <span class="hr">Z2 &lt;145bpm</span>. High cadence 90+ rpm.</span></li><li class="step"><span class="sn">PM</span><span class="st">Afternoon <span class="hr">Epsom &rarr; Brixton</span>: <span class="hr">Z2 &lt;145bpm</span>. Stay relaxed.</span></li></ul></div><div class="divl"></div><div class="sb"><div class="stype">&#127947; KETTLEBELL EVENING</div><div class="kbl" onclick="goKB('A');event.stopPropagation()"><div><div class="kbl-t">Circuit A &mdash; Foundation</div><div class="kbl-s">Goblet Squat &middot; Deadlift &middot; Halo &middot; Glute Bridge</div></div><span class="kbl-a">&rsaquo;</span></div></div></div></div><div class="dcard" onclick="toggleDay(this)"><div class="dhead"><span class="dname">WEDNESDAY</span><span class="dtag tc">COMMUTE</span><span class="chv">&#8964;</span></div><div class="dbody"><div class="sb"><div class="stype">&#128692; COMMUTE &middot; HR BASED</div><div class="stit">Z2 Both Ways</div><div data-chart="tc-wed-b2-am"></div><div data-chart="tc-wed-b2-pm"></div><ul class="steps"><li class="step"><span class="sn">AM</span><span class="st">Morning <span class="hr">Brixton &rarr; Epsom</span>: <span class="hr">Z2 &lt;145bpm</span>.</span></li><li class="step"><span class="sn">PM</span><span class="st">Afternoon <span class="hr">Epsom &rarr; Brixton</span>: <span class="hr">Z2 &lt;145bpm</span>.</span></li></ul></div></div></div><div class="dcard" onclick="toggleDay(this)"><div class="dhead"><span class="dname">THURSDAY</span><span class="dtag tm">COMMUTE + KB</span><span class="chv">&#8964;</span></div><div class="dbody"><div class="sb"><div class="stype">&#128692; COMMUTE &middot; HR BASED</div><div class="stit">Easy In / Tempo Out</div><div data-chart="tc-th-b2-am"></div><div data-chart="tc-th-b2-pm"></div><ul class="steps"><li class="step"><span class="sn">AM</span><span class="st">Morning <span class="hr">Brixton &rarr; Epsom</span>: <span class="hr">Z2 &lt;145bpm</span> all the way.</span></li><li class="step"><span class="sn">PM</span><span class="st">Afternoon <span class="hr">Epsom &rarr; Brixton</span>: <span class="hr">2&times;5 min at 155&ndash;162bpm (Z3)</span>, 5 min Z2 between.</span></li></ul></div><div class="divl"></div><div class="sb"><div class="stype">&#127947; KETTLEBELL EVENING</div><div class="kbl" onclick="goKB('A');event.stopPropagation()"><div><div class="kbl-t">Circuit A &mdash; Foundation</div><div class="kbl-s">Goblet Squat &middot; Deadlift &middot; Halo &middot; Glute Bridge</div></div><span class="kbl-a">&rsaquo;</span></div></div></div></div><div class="dcard" onclick="toggleDay(this)"><div class="dhead"><span class="dname">FRIDAY</span><span class="dtag tx">REST</span><span class="chv">&#8964;</span></div><div class="dbody"><div class="sb"><div class="sdesc">Rest before weekend ride. Light mobility.</div></div></div></div><div class="dcard" onclick="toggleDay(this)"><div class="dhead"><span class="dname">SATURDAY</span><span class="dtag tc">RIDE &middot; POWER</span><span class="chv">&#8964;</span></div><div class="dbody"><div class="sb"><div class="stype">&#128692; WEEKEND RIDE &middot; POWER METER</div><div class="stit">Aerobic Base &mdash; 2.5 hrs</div><div data-chart="tc-sat-w2"></div><ul class="steps"><li class="step"><span class="sn">WU</span><span class="st">Warm up 15 min: <span class="pw">&lt;150W</span></span></li><li class="step"><span class="sn">MAIN</span><span class="st">2 hrs: <span class="pw">140&ndash;167W</span> steady.</span></li><li class="step"><span class="sn">CD</span><span class="st">Cool down 15 min easy.</span></li></ul></div></div></div><div class="dcard" onclick="toggleDay(this)"><div class="dhead"><span class="dname">SUNDAY</span><span class="dtag tr">RUN</span><span class="chv">&#8964;</span></div><div class="dbody"><div class="sb"><div class="stype">&#127939; RUN</div><div class="stit">Easy 5km</div><div data-chart="tc-sun-w1b2"></div><ul class="steps"><li class="step"><span class="sn">RUN</span><span class="st">5km at <span class="hr">6:00&ndash;6:30/km</span></span></li><li class="step"><span class="sn">STR</span><span class="st">5 min stretch.</span></li></ul></div></div></div></div><div class="wcont" id="wk-b3"><div class="dcard" onclick="toggleDay(this)"><div class="dhead"><span class="dname">MONDAY</span><span class="dtag tx">REST</span><span class="chv">&#8964;</span></div><div class="dbody"><div class="sb"><div class="sdesc">Full rest. Light stretching only.</div></div></div></div><div class="dcard" onclick="toggleDay(this)"><div class="dhead"><span class="dname">TUESDAY</span><span class="dtag tm">COMMUTE + KB</span><span class="chv">&#8964;</span></div><div class="dbody"><div class="sb"><div class="stype">&#128692; COMMUTE &middot; HR BASED</div><div class="stit">Z2 Both Ways</div><div data-chart="tc-tu-b3-am"></div><div data-chart="tc-tu-b3-pm"></div><ul class="steps"><li class="step"><span class="sn">AM</span><span class="st">Morning <span class="hr">Brixton &rarr; Epsom</span>: <span class="hr">Z2 &lt;145bpm</span>. High cadence 90+ rpm.</span></li><li class="step"><span class="sn">PM</span><span class="st">Afternoon <span class="hr">Epsom &rarr; Brixton</span>: <span class="hr">Z2 &lt;145bpm</span>. Stay relaxed.</span></li></ul></div><div class="divl"></div><div class="sb"><div class="stype">&#127947; KETTLEBELL EVENING</div><div class="kbl" onclick="goKB('B');event.stopPropagation()"><div><div class="kbl-t">Circuit B &mdash; Stability</div><div class="kbl-s">Single-leg RDL &middot; Renegade Row &middot; Lateral Lunge &middot; Dead Bug</div></div><span class="kbl-a">&rsaquo;</span></div></div></div></div><div class="dcard" onclick="toggleDay(this)"><div class="dhead"><span class="dname">WEDNESDAY</span><span class="dtag tc">COMMUTE</span><span class="chv">&#8964;</span></div><div class="dbody"><div class="sb"><div class="stype">&#128692; COMMUTE &middot; HR BASED</div><div class="stit">Z2 Both Ways</div><div data-chart="tc-wed-b3-am"></div><div data-chart="tc-wed-b3-pm"></div><ul class="steps"><li class="step"><span class="sn">AM</span><span class="st">Morning <span class="hr">Brixton &rarr; Epsom</span>: <span class="hr">Z2 &lt;145bpm</span>.</span></li><li class="step"><span class="sn">PM</span><span class="st">Afternoon <span class="hr">Epsom &rarr; Brixton</span>: <span class="hr">Z2 &lt;145bpm</span>.</span></li></ul></div></div></div><div class="dcard" onclick="toggleDay(this)"><div class="dhead"><span class="dname">THURSDAY</span><span class="dtag tm">COMMUTE + KB</span><span class="chv">&#8964;</span></div><div class="dbody"><div class="sb"><div class="stype">&#128692; COMMUTE &middot; HR BASED</div><div class="stit">Easy In / Tempo Out</div><div data-chart="tc-th-b3-am"></div><div data-chart="tc-th-b3-pm"></div><ul class="steps"><li class="step"><span class="sn">AM</span><span class="st">Morning <span class="hr">Brixton &rarr; Epsom</span>: <span class="hr">Z2 &lt;145bpm</span> all the way.</span></li><li class="step"><span class="sn">PM</span><span class="st">Afternoon <span class="hr">Epsom &rarr; Brixton</span>: <span class="hr">2&times;5 min Z3</span>, building rhythm.</span></li></ul></div><div class="divl"></div><div class="sb"><div class="stype">&#127947; KETTLEBELL EVENING</div><div class="kbl" onclick="goKB('B');event.stopPropagation()"><div><div class="kbl-t">Circuit B &mdash; Stability</div><div class="kbl-s">Single-leg RDL &middot; Renegade Row &middot; Lateral Lunge &middot; Dead Bug</div></div><span class="kbl-a">&rsaquo;</span></div></div></div></div><div class="dcard" onclick="toggleDay(this)"><div class="dhead"><span class="dname">FRIDAY</span><span class="dtag tx">REST</span><span class="chv">&#8964;</span></div><div class="dbody"><div class="sb"><div class="sdesc">Rest before weekend ride. Light mobility.</div></div></div></div><div class="dcard" onclick="toggleDay(this)"><div class="dhead"><span class="dname">SATURDAY</span><span class="dtag tc">RIDE &middot; POWER</span><span class="chv">&#8964;</span></div><div class="dbody"><div class="sb"><div class="stype">&#128692; WEEKEND RIDE &middot; POWER METER</div><div class="stit">Sweet Spot Intro</div><div data-chart="tc-sat-w3"></div><ul class="steps"><li class="step"><span class="sn">WU</span><span class="st">Warm up 15 min.</span></li><li class="step"><span class="sn">SS</span><span class="st">1&times;20 min at <span class="pw">189&ndash;205W</span> (sweet spot).</span></li><li class="step"><span class="sn">Z2</span><span class="st">Remainder Z2. Total 2&ndash;2.5 hrs.</span></li></ul></div></div></div><div class="dcard" onclick="toggleDay(this)"><div class="dhead"><span class="dname">SUNDAY</span><span class="dtag tr">RUN</span><span class="chv">&#8964;</span></div><div class="dbody"><div class="sb"><div class="stype">&#127939; RUN</div><div class="stit">Easy 7km</div><div data-chart="tc-sun-w3"></div><ul class="steps"><li class="step"><span class="sn">RUN</span><span class="st">7km at <span class="hr">6:00&ndash;6:30/km</span>, HR &lt;155bpm</span></li></ul></div></div></div></div><div class="wcont" id="wk-b4"><div class="dcard" onclick="toggleDay(this)"><div class="dhead"><span class="dname">MONDAY</span><span class="dtag tx">REST</span><span class="chv">&#8964;</span></div><div class="dbody"><div class="sb"><div class="sdesc">Full rest. Light stretching only.</div></div></div></div><div class="dcard" onclick="toggleDay(this)"><div class="dhead"><span class="dname">TUESDAY</span><span class="dtag tm">COMMUTE + KB</span><span class="chv">&#8964;</span></div><div class="dbody"><div class="sb"><div class="stype">&#128692; COMMUTE &middot; HR BASED</div><div class="stit">Z2 Both Ways</div><div data-chart="tc-tu-b4-am"></div><div data-chart="tc-tu-b4-pm"></div><ul class="steps"><li class="step"><span class="sn">AM</span><span class="st">Morning <span class="hr">Brixton &rarr; Epsom</span>: <span class="hr">Z2 &lt;145bpm</span>. High cadence 90+ rpm.</span></li><li class="step"><span class="sn">PM</span><span class="st">Afternoon <span class="hr">Epsom &rarr; Brixton</span>: <span class="hr">Z2 &lt;145bpm</span>. Stay relaxed.</span></li></ul></div><div class="divl"></div><div class="sb"><div class="stype">&#127947; KETTLEBELL EVENING</div><div class="kbl" onclick="goKB('A');event.stopPropagation()"><div><div class="kbl-t">Circuit &mdash; optional light</div><div class="kbl-s">Recovery week: skip or go very light</div></div><span class="kbl-a">&rsaquo;</span></div></div></div></div><div class="dcard" onclick="toggleDay(this)"><div class="dhead"><span class="dname">WEDNESDAY</span><span class="dtag tx">REST</span><span class="chv">&#8964;</span></div><div class="dbody"><div class="sb"><div class="sdesc">Recovery week. Full rest.</div></div></div></div><div class="dcard" onclick="toggleDay(this)"><div class="dhead"><span class="dname">THURSDAY</span><span class="dtag tm">COMMUTE + KB</span><span class="chv">&#8964;</span></div><div class="dbody"><div class="sb"><div class="stype">&#128692; COMMUTE &middot; HR BASED</div><div class="stit">Easy In / Tempo Out</div><div data-chart="tc-th-b4-am"></div><div data-chart="tc-th-b4-pm"></div><ul class="steps"><li class="step"><span class="sn">AM</span><span class="st">Morning <span class="hr">Brixton &rarr; Epsom</span>: <span class="hr">Z2 &lt;145bpm</span> all the way.</span></li><li class="step"><span class="sn">PM</span><span class="st">Afternoon <span class="hr">Epsom &rarr; Brixton</span>: <span class="hr">Z2 only &lt;145bpm</span>. Recovery week.</span></li></ul></div><div class="divl"></div><div class="sb"><div class="stype">&#127947; KETTLEBELL EVENING</div><div class="kbl" onclick="goKB('A');event.stopPropagation()"><div><div class="kbl-t">Circuit &mdash; optional light</div><div class="kbl-s">Recovery week: skip or go very light</div></div><span class="kbl-a">&rsaquo;</span></div></div></div></div><div class="dcard" onclick="toggleDay(this)"><div class="dhead"><span class="dname">FRIDAY</span><span class="dtag tx">REST</span><span class="chv">&#8964;</span></div><div class="dbody"><div class="sb"><div class="sdesc">Rest before weekend ride. Light mobility.</div></div></div></div><div class="dcard" onclick="toggleDay(this)"><div class="dhead"><span class="dname">SATURDAY</span><span class="dtag tc">RIDE &middot; POWER</span><span class="chv">&#8964;</span></div><div class="dbody"><div class="sb"><div class="stype">&#128692; WEEKEND RIDE &middot; POWER METER</div><div class="stit">Easy Z2 &mdash; 90 min</div><div data-chart="tc-sat-w4"></div><ul class="steps"><li class="step"><span class="sn">RIDE</span><span class="st">90 min all Z2: <span class="pw">&lt;167W</span>, HR &lt;155bpm. No intervals.</span></li></ul></div></div></div><div class="dcard" onclick="toggleDay(this)"><div class="dhead"><span class="dname">SUNDAY</span><span class="dtag tr">RUN</span><span class="chv">&#8964;</span></div><div class="dbody"><div class="sb"><div class="stype">&#127939; RUN</div><div class="stit">Easy 5km</div><div data-chart="tc-sun-w4"></div><ul class="steps"><li class="step"><span class="sn">RUN</span><span class="st">Easy 5km, fully relaxed.</span></li></ul></div></div></div></div></div><div class="pcont" id="ph-develop"><div class="note"><strong>Develop Phase:</strong> 2&times;20 sweet spot is the weekend anchor. Thu return pushes Z4. Run adds 1km tempo. KB Circuit C all 4 weeks.</div><div class="kbl" onclick="goKB('C');"><div><div class="kbl-t">&#127947; KB Circuit C &mdash; Power</div><div class="kbl-s">Weeks 5&ndash;8 &middot; 3 rounds &middot; 45s on / 15s rest</div></div><span class="kbl-a">&rsaquo;</span></div><div class="wnav"><button class="wbtn active" onclick="switchWeek('d5',this,'develop')">Week 5</button><button class="wbtn" onclick="switchWeek('d6',this,'develop')">Week 6</button><button class="wbtn" onclick="switchWeek('d7',this,'develop')">Week 7</button><button class="wbtn" onclick="switchWeek('d8',this,'develop')">Week 8</button></div><div class="wcont active" id="wk-d5"><div class="dcard" onclick="toggleDay(this)"><div class="dhead"><span class="dname">MONDAY</span><span class="dtag tx">REST</span><span class="chv">&#8964;</span></div><div class="dbody"><div class="sb"><div class="sdesc">Full rest.</div></div></div></div><div class="dcard" onclick="toggleDay(this)"><div class="dhead"><span class="dname">TUESDAY</span><span class="dtag tm">COMMUTE + KB</span><span class="chv">&#8964;</span></div><div class="dbody"><div class="sb"><div class="stype">&#128692; COMMUTE &middot; HR BASED</div><div class="stit">Z2 Both Ways</div><div data-chart="tc-d5-tu-am"></div><div data-chart="tc-d5-tu-pm"></div><ul class="steps"><li class="step"><span class="sn">AM</span><span class="st">Morning <span class="hr">Brixton &rarr; Epsom</span>: <span class="hr">Z2 &lt;145bpm</span>.</span></li><li class="step"><span class="sn">PM</span><span class="st">Afternoon <span class="hr">Epsom &rarr; Brixton</span>: <span class="hr">Z2 &lt;145bpm</span>.</span></li></ul></div><div class="divl"></div><div class="sb"><div class="stype">&#127947; KETTLEBELL EVENING</div><div class="kbl" onclick="goKB('C');event.stopPropagation()"><div><div class="kbl-t">Circuit C &mdash; Power</div><div class="kbl-s">KB Swing &middot; Clean &amp; Press &middot; Squat Pulse &middot; Get-Up</div></div><span class="kbl-a">&rsaquo;</span></div></div></div></div><div class="dcard" onclick="toggleDay(this)"><div class="dhead"><span class="dname">WEDNESDAY</span><span class="dtag tc">COMMUTE</span><span class="chv">&#8964;</span></div><div class="dbody"><div class="sb"><div class="stype">&#128692; COMMUTE &middot; HR BASED</div><div class="stit">Z2 Both Ways</div><div data-chart="tc-d5-wed-am"></div><div data-chart="tc-d5-wed-pm"></div><ul class="steps"><li class="step"><span class="sn">AM</span><span class="st">Morning <span class="hr">Brixton &rarr; Epsom</span>: <span class="hr">Z2</span>.</span></li><li class="step"><span class="sn">PM</span><span class="st">Afternoon <span class="hr">Epsom &rarr; Brixton</span>: <span class="hr">Z2</span>.</span></li></ul></div></div></div><div class="dcard" onclick="toggleDay(this)"><div class="dhead"><span class="dname">THURSDAY</span><span class="dtag tm">COMMUTE + KB</span><span class="chv">&#8964;</span></div><div class="dbody"><div class="sb"><div class="stype">&#128692; COMMUTE &middot; HR BASED</div><div class="stit">Easy In / Z4 Out</div><div data-chart="tc-d5-thu-am"></div><div data-chart="tc-d5-thu-pm"></div><ul class="steps"><li class="step"><span class="sn">AM</span><span class="st">Morning <span class="hr">Brixton &rarr; Epsom</span>: <span class="hr">Z2 &lt;145bpm</span>.</span></li><li class="step"><span class="sn">PM</span><span class="st">Afternoon <span class="hr">Epsom &rarr; Brixton</span>: <span class="hr">20+ min sustained at 163&ndash;170bpm (Z4)</span> on Surrey stretch.</span></li></ul></div><div class="divl"></div><div class="sb"><div class="stype">&#127947; KETTLEBELL EVENING</div><div class="kbl" onclick="goKB('C');event.stopPropagation()"><div><div class="kbl-t">Circuit C &mdash; Power</div><div class="kbl-s">KB Swing &middot; Clean &amp; Press &middot; Squat Pulse &middot; Get-Up</div></div><span class="kbl-a">&rsaquo;</span></div></div></div></div><div class="dcard" onclick="toggleDay(this)"><div class="dhead"><span class="dname">FRIDAY</span><span class="dtag tx">REST</span><span class="chv">&#8964;</span></div><div class="dbody"><div class="sb"><div class="sdesc">Rest before weekend.</div></div></div></div><div class="dcard" onclick="toggleDay(this)"><div class="dhead"><span class="dname">SATURDAY</span><span class="dtag tc">RIDE &middot; POWER</span><span class="chv">&#8964;</span></div><div class="dbody"><div class="sb"><div class="stype">&#128692; WEEKEND RIDE &middot; POWER METER</div><div class="stit">2&times;20 Sweet Spot</div><div data-chart="tc-dev-sat1"></div><ul class="steps"><li class="step"><span class="sn">WU</span><span class="st">15 min warm up + 15 min Z2.</span></li><li class="step"><span class="sn">SS1</span><span class="st">20 min at <span class="pw">195&ndash;211W</span>.</span></li><li class="step"><span class="sn">REC</span><span class="st">10 min easy.</span></li><li class="step"><span class="sn">SS2</span><span class="st">20 min at <span class="pw">195&ndash;211W</span>.</span></li><li class="step"><span class="sn">CD</span><span class="st">Z2 + cool down.</span></li></ul></div></div></div><div class="dcard" onclick="toggleDay(this)"><div class="dhead"><span class="dname">SUNDAY</span><span class="dtag tr">RUN</span><span class="chv">&#8964;</span></div><div class="dbody"><div class="sb"><div class="stype">&#127939; RUN</div><div class="stit">Easy 8km</div><div data-chart="tc-dev-run"></div><ul class="steps"><li class="step"><span class="sn">RUN</span><span class="st">8km easy at <span class="hr">6:00&ndash;6:30/km</span></span></li></ul></div></div></div></div><div class="wcont" id="wk-d6"><div class="note">Week 6 mirrors Week 5 with a small step up in sweet-spot duration. Same daily structure.</div><div class="dcard" onclick="toggleDay(this)"><div class="dhead"><span class="dname">MONDAY</span><span class="dtag tx">REST</span><span class="chv">&#8964;</span></div><div class="dbody"><div class="sb"><div class="sdesc">Full rest.</div></div></div></div><div class="dcard" onclick="toggleDay(this)"><div class="dhead"><span class="dname">TUESDAY</span><span class="dtag tm">COMMUTE + KB</span><span class="chv">&#8964;</span></div><div class="dbody"><div class="sb"><div class="stype">&#128692; COMMUTE &middot; HR BASED</div><div class="stit">Z2 Both Ways</div><div data-chart="tc-d5-tu-am"></div><div data-chart="tc-d5-tu-pm"></div><ul class="steps"><li class="step"><span class="sn">AM</span><span class="st">Morning <span class="hr">Brixton &rarr; Epsom</span>: <span class="hr">Z2 &lt;145bpm</span>.</span></li><li class="step"><span class="sn">PM</span><span class="st">Afternoon <span class="hr">Epsom &rarr; Brixton</span>: <span class="hr">Z2 &lt;145bpm</span>.</span></li></ul></div><div class="divl"></div><div class="sb"><div class="stype">&#127947; KETTLEBELL EVENING</div><div class="kbl" onclick="goKB('C');event.stopPropagation()"><div><div class="kbl-t">Circuit C &mdash; Power</div><div class="kbl-s">KB Swing &middot; Clean &amp; Press &middot; Squat Pulse &middot; Get-Up</div></div><span class="kbl-a">&rsaquo;</span></div></div></div></div><div class="dcard" onclick="toggleDay(this)"><div class="dhead"><span class="dname">WEDNESDAY</span><span class="dtag tc">COMMUTE</span><span class="chv">&#8964;</span></div><div class="dbody"><div class="sb"><div class="stype">&#128692; COMMUTE &middot; HR BASED</div><div class="stit">Z2 Both Ways</div><div data-chart="tc-d5-wed-am"></div><div data-chart="tc-d5-wed-pm"></div><ul class="steps"><li class="step"><span class="sn">AM</span><span class="st">Morning <span class="hr">Brixton &rarr; Epsom</span>: <span class="hr">Z2</span>.</span></li><li class="step"><span class="sn">PM</span><span class="st">Afternoon <span class="hr">Epsom &rarr; Brixton</span>: <span class="hr">Z2</span>.</span></li></ul></div></div></div><div class="dcard" onclick="toggleDay(this)"><div class="dhead"><span class="dname">THURSDAY</span><span class="dtag tm">COMMUTE + KB</span><span class="chv">&#8964;</span></div><div class="dbody"><div class="sb"><div class="stype">&#128692; COMMUTE &middot; HR BASED</div><div class="stit">Easy In / Z4 Out</div><div data-chart="tc-d5-thu-am"></div><div data-chart="tc-d5-thu-pm"></div><ul class="steps"><li class="step"><span class="sn">AM</span><span class="st">Morning <span class="hr">Brixton &rarr; Epsom</span>: <span class="hr">Z2 &lt;145bpm</span>.</span></li><li class="step"><span class="sn">PM</span><span class="st">Afternoon <span class="hr">Epsom &rarr; Brixton</span>: <span class="hr">20+ min sustained at 163&ndash;170bpm (Z4)</span> on Surrey stretch.</span></li></ul></div><div class="divl"></div><div class="sb"><div class="stype">&#127947; KETTLEBELL EVENING</div><div class="kbl" onclick="goKB('C');event.stopPropagation()"><div><div class="kbl-t">Circuit C &mdash; Power</div><div class="kbl-s">KB Swing &middot; Clean &amp; Press &middot; Squat Pulse &middot; Get-Up</div></div><span class="kbl-a">&rsaquo;</span></div></div></div></div><div class="dcard" onclick="toggleDay(this)"><div class="dhead"><span class="dname">FRIDAY</span><span class="dtag tx">REST</span><span class="chv">&#8964;</span></div><div class="dbody"><div class="sb"><div class="sdesc">Rest before weekend.</div></div></div></div><div class="dcard" onclick="toggleDay(this)"><div class="dhead"><span class="dname">SATURDAY</span><span class="dtag tc">RIDE &middot; POWER</span><span class="chv">&#8964;</span></div><div class="dbody"><div class="sb"><div class="stype">&#128692; WEEKEND RIDE &middot; POWER METER</div><div class="stit">2&times;20 Sweet Spot</div><div data-chart="tc-dev-sat1"></div><ul class="steps"><li class="step"><span class="sn">WU</span><span class="st">15 min warm up + 15 min Z2.</span></li><li class="step"><span class="sn">SS1</span><span class="st">20 min at <span class="pw">195&ndash;211W</span>.</span></li><li class="step"><span class="sn">REC</span><span class="st">10 min easy.</span></li><li class="step"><span class="sn">SS2</span><span class="st">20 min at <span class="pw">195&ndash;211W</span>.</span></li><li class="step"><span class="sn">CD</span><span class="st">Z2 + cool down.</span></li></ul></div></div></div><div class="dcard" onclick="toggleDay(this)"><div class="dhead"><span class="dname">SUNDAY</span><span class="dtag tr">RUN</span><span class="chv">&#8964;</span></div><div class="dbody"><div class="sb"><div class="stype">&#127939; RUN</div><div class="stit">Easy 8km</div><div data-chart="tc-dev-run"></div><ul class="steps"><li class="step"><span class="sn">RUN</span><span class="st">8km easy at <span class="hr">6:00&ndash;6:30/km</span></span></li></ul></div></div></div></div><div class="wcont" id="wk-d7"><div class="dcard" onclick="toggleDay(this)"><div class="dhead"><span class="dname">MONDAY</span><span class="dtag tx">REST</span><span class="chv">&#8964;</span></div><div class="dbody"><div class="sb"><div class="sdesc">Full rest.</div></div></div></div><div class="dcard" onclick="toggleDay(this)"><div class="dhead"><span class="dname">TUESDAY</span><span class="dtag tm">COMMUTE + KB</span><span class="chv">&#8964;</span></div><div class="dbody"><div class="sb"><div class="stype">&#128692; COMMUTE &middot; HR BASED</div><div class="stit">Z2 Both Ways</div><div data-chart="tc-d7-tu-am"></div><div data-chart="tc-d7-tu-pm"></div><ul class="steps"><li class="step"><span class="sn">AM</span><span class="st">Morning <span class="hr">Brixton &rarr; Epsom</span>: <span class="hr">Z2 &lt;145bpm</span>.</span></li><li class="step"><span class="sn">PM</span><span class="st">Afternoon <span class="hr">Epsom &rarr; Brixton</span>: <span class="hr">Z2 &lt;145bpm</span>.</span></li></ul></div><div class="divl"></div><div class="sb"><div class="stype">&#127947; KETTLEBELL EVENING</div><div class="kbl" onclick="goKB('C');event.stopPropagation()"><div><div class="kbl-t">Circuit C &mdash; Power</div><div class="kbl-s">KB Swing &middot; Clean &amp; Press &middot; Squat Pulse &middot; Get-Up</div></div><span class="kbl-a">&rsaquo;</span></div></div></div></div><div class="dcard" onclick="toggleDay(this)"><div class="dhead"><span class="dname">WEDNESDAY</span><span class="dtag tc">COMMUTE</span><span class="chv">&#8964;</span></div><div class="dbody"><div class="sb"><div class="stype">&#128692; COMMUTE &middot; HR BASED</div><div class="stit">Z2 Both Ways</div><div data-chart="tc-d7-wed-am"></div><div data-chart="tc-d7-wed-pm"></div><ul class="steps"><li class="step"><span class="sn">AM</span><span class="st">Morning <span class="hr">Brixton &rarr; Epsom</span>: <span class="hr">Z2</span>.</span></li><li class="step"><span class="sn">PM</span><span class="st">Afternoon <span class="hr">Epsom &rarr; Brixton</span>: <span class="hr">Z2</span>.</span></li></ul></div></div></div><div class="dcard" onclick="toggleDay(this)"><div class="dhead"><span class="dname">THURSDAY</span><span class="dtag tm">COMMUTE + KB</span><span class="chv">&#8964;</span></div><div class="dbody"><div class="sb"><div class="stype">&#128692; COMMUTE &middot; HR BASED</div><div class="stit">Easy In / Z4 Out</div><div data-chart="tc-d7-thu-am"></div><div data-chart="tc-d7-thu-pm"></div><ul class="steps"><li class="step"><span class="sn">AM</span><span class="st">Morning <span class="hr">Brixton &rarr; Epsom</span>: <span class="hr">Z2 &lt;145bpm</span>.</span></li><li class="step"><span class="sn">PM</span><span class="st">Afternoon <span class="hr">Epsom &rarr; Brixton</span>: <span class="hr">Z4 sustained blocks</span> where traffic allows.</span></li></ul></div><div class="divl"></div><div class="sb"><div class="stype">&#127947; KETTLEBELL EVENING</div><div class="kbl" onclick="goKB('C');event.stopPropagation()"><div><div class="kbl-t">Circuit C &mdash; Power</div><div class="kbl-s">KB Swing &middot; Clean &amp; Press &middot; Squat Pulse &middot; Get-Up</div></div><span class="kbl-a">&rsaquo;</span></div></div></div></div><div class="dcard" onclick="toggleDay(this)"><div class="dhead"><span class="dname">FRIDAY</span><span class="dtag tx">REST</span><span class="chv">&#8964;</span></div><div class="dbody"><div class="sb"><div class="sdesc">Rest before weekend.</div></div></div></div><div class="dcard" onclick="toggleDay(this)"><div class="dhead"><span class="dname">SATURDAY</span><span class="dtag tc">RIDE &middot; POWER</span><span class="chv">&#8964;</span></div><div class="dbody"><div class="sb"><div class="stype">&#128692; WEEKEND RIDE &middot; POWER METER</div><div class="stit">SS + Threshold Mix</div><div data-chart="tc-dev-sat2"></div><ul class="steps"><li class="step"><span class="sn">WU</span><span class="st">15 min warm up.</span></li><li class="step"><span class="sn">SS</span><span class="st">20 min sweet spot <span class="pw">195&ndash;211W</span>.</span></li><li class="step"><span class="sn">THR</span><span class="st">12 min threshold <span class="pw">215&ndash;230W</span>.</span></li><li class="step"><span class="sn">SS</span><span class="st">12 min sweet spot.</span></li><li class="step"><span class="sn">CD</span><span class="st">Cool down.</span></li></ul></div></div></div><div class="dcard" onclick="toggleDay(this)"><div class="dhead"><span class="dname">SUNDAY</span><span class="dtag tr">RUN</span><span class="chv">&#8964;</span></div><div class="dbody"><div class="sb"><div class="stype">&#127939; RUN</div><div class="stit">Tempo 8km</div><div data-chart="tc-dev-run2"></div><ul class="steps"><li class="step"><span class="sn">EASY</span><span class="st">3km easy.</span></li><li class="step"><span class="sn">THR</span><span class="st">1km at <span class="hr">5:00&ndash;5:10/km</span>.</span></li><li class="step"><span class="sn">EASY</span><span class="st">3km easy + cool.</span></li></ul></div></div></div></div><div class="wcont" id="wk-d8"><div class="note">Week 8 repeats Week 7 then eases slightly into the Peak phase. Same daily structure.</div><div class="dcard" onclick="toggleDay(this)"><div class="dhead"><span class="dname">MONDAY</span><span class="dtag tx">REST</span><span class="chv">&#8964;</span></div><div class="dbody"><div class="sb"><div class="sdesc">Full rest.</div></div></div></div><div class="dcard" onclick="toggleDay(this)"><div class="dhead"><span class="dname">TUESDAY</span><span class="dtag tm">COMMUTE + KB</span><span class="chv">&#8964;</span></div><div class="dbody"><div class="sb"><div class="stype">&#128692; COMMUTE &middot; HR BASED</div><div class="stit">Z2 Both Ways</div><div data-chart="tc-d7-tu-am"></div><div data-chart="tc-d7-tu-pm"></div><ul class="steps"><li class="step"><span class="sn">AM</span><span class="st">Morning <span class="hr">Brixton &rarr; Epsom</span>: <span class="hr">Z2 &lt;145bpm</span>.</span></li><li class="step"><span class="sn">PM</span><span class="st">Afternoon <span class="hr">Epsom &rarr; Brixton</span>: <span class="hr">Z2 &lt;145bpm</span>.</span></li></ul></div><div class="divl"></div><div class="sb"><div class="stype">&#127947; KETTLEBELL EVENING</div><div class="kbl" onclick="goKB('C');event.stopPropagation()"><div><div class="kbl-t">Circuit C &mdash; Power</div><div class="kbl-s">KB Swing &middot; Clean &amp; Press &middot; Squat Pulse &middot; Get-Up</div></div><span class="kbl-a">&rsaquo;</span></div></div></div></div><div class="dcard" onclick="toggleDay(this)"><div class="dhead"><span class="dname">WEDNESDAY</span><span class="dtag tc">COMMUTE</span><span class="chv">&#8964;</span></div><div class="dbody"><div class="sb"><div class="stype">&#128692; COMMUTE &middot; HR BASED</div><div class="stit">Z2 Both Ways</div><div data-chart="tc-d7-wed-am"></div><div data-chart="tc-d7-wed-pm"></div><ul class="steps"><li class="step"><span class="sn">AM</span><span class="st">Morning <span class="hr">Brixton &rarr; Epsom</span>: <span class="hr">Z2</span>.</span></li><li class="step"><span class="sn">PM</span><span class="st">Afternoon <span class="hr">Epsom &rarr; Brixton</span>: <span class="hr">Z2</span>.</span></li></ul></div></div></div><div class="dcard" onclick="toggleDay(this)"><div class="dhead"><span class="dname">THURSDAY</span><span class="dtag tm">COMMUTE + KB</span><span class="chv">&#8964;</span></div><div class="dbody"><div class="sb"><div class="stype">&#128692; COMMUTE &middot; HR BASED</div><div class="stit">Easy In / Z4 Out</div><div data-chart="tc-d7-thu-am"></div><div data-chart="tc-d7-thu-pm"></div><ul class="steps"><li class="step"><span class="sn">AM</span><span class="st">Morning <span class="hr">Brixton &rarr; Epsom</span>: <span class="hr">Z2 &lt;145bpm</span>.</span></li><li class="step"><span class="sn">PM</span><span class="st">Afternoon <span class="hr">Epsom &rarr; Brixton</span>: <span class="hr">Z4 sustained blocks</span> where traffic allows.</span></li></ul></div><div class="divl"></div><div class="sb"><div class="stype">&#127947; KETTLEBELL EVENING</div><div class="kbl" onclick="goKB('C');event.stopPropagation()"><div><div class="kbl-t">Circuit C &mdash; Power</div><div class="kbl-s">KB Swing &middot; Clean &amp; Press &middot; Squat Pulse &middot; Get-Up</div></div><span class="kbl-a">&rsaquo;</span></div></div></div></div><div class="dcard" onclick="toggleDay(this)"><div class="dhead"><span class="dname">FRIDAY</span><span class="dtag tx">REST</span><span class="chv">&#8964;</span></div><div class="dbody"><div class="sb"><div class="sdesc">Rest before weekend.</div></div></div></div><div class="dcard" onclick="toggleDay(this)"><div class="dhead"><span class="dname">SATURDAY</span><span class="dtag tc">RIDE &middot; POWER</span><span class="chv">&#8964;</span></div><div class="dbody"><div class="sb"><div class="stype">&#128692; WEEKEND RIDE &middot; POWER METER</div><div class="stit">SS + Threshold Mix</div><div data-chart="tc-dev-sat2"></div><ul class="steps"><li class="step"><span class="sn">WU</span><span class="st">15 min warm up.</span></li><li class="step"><span class="sn">SS</span><span class="st">20 min sweet spot <span class="pw">195&ndash;211W</span>.</span></li><li class="step"><span class="sn">THR</span><span class="st">12 min threshold <span class="pw">215&ndash;230W</span>.</span></li><li class="step"><span class="sn">SS</span><span class="st">12 min sweet spot.</span></li><li class="step"><span class="sn">CD</span><span class="st">Cool down.</span></li></ul></div></div></div><div class="dcard" onclick="toggleDay(this)"><div class="dhead"><span class="dname">SUNDAY</span><span class="dtag tr">RUN</span><span class="chv">&#8964;</span></div><div class="dbody"><div class="sb"><div class="stype">&#127939; RUN</div><div class="stit">Tempo 8km</div><div data-chart="tc-dev-run2"></div><ul class="steps"><li class="step"><span class="sn">EASY</span><span class="st">3km easy.</span></li><li class="step"><span class="sn">THR</span><span class="st">1km at <span class="hr">5:00&ndash;5:10/km</span>.</span></li><li class="step"><span class="sn">EASY</span><span class="st">3km easy + cool.</span></li></ul></div></div></div></div></div><div class="pcont" id="ph-peak"><div class="note"><strong>Peak Phase:</strong> Threshold intervals added. Weekend alternates SS (odd weeks) and threshold (even weeks). Run up to 10km. FTP retest week 12.</div><div class="kbl" onclick="goKB('C');"><div><div class="kbl-t">&#127947; KB Circuit C &mdash; Power (heavier)</div><div class="kbl-s">Weeks 9&ndash;12 &middot; increase load &middot; 3 rounds</div></div><span class="kbl-a">&rsaquo;</span></div><div class="wnav"><button class="wbtn active" onclick="switchWeek('p9',this,'peak')">Week 9</button><button class="wbtn" onclick="switchWeek('p10',this,'peak')">Week 10</button><button class="wbtn" onclick="switchWeek('p11',this,'peak')">Week 11</button><button class="wbtn" onclick="switchWeek('p12',this,'peak')">Week 12</button></div><div class="wcont active" id="wk-p9"><div class="dcard" onclick="toggleDay(this)"><div class="dhead"><span class="dname">MONDAY</span><span class="dtag tx">REST</span><span class="chv">&#8964;</span></div><div class="dbody"><div class="sb"><div class="sdesc">Full rest.</div></div></div></div><div class="dcard" onclick="toggleDay(this)"><div class="dhead"><span class="dname">TUESDAY</span><span class="dtag tm">COMMUTE + KB</span><span class="chv">&#8964;</span></div><div class="dbody"><div class="sb"><div class="stype">&#128692; COMMUTE &middot; HR BASED</div><div class="stit">Z2 Both Ways</div><div data-chart="tc-p9-tu-am"></div><div data-chart="tc-p9-tu-pm"></div><ul class="steps"><li class="step"><span class="sn">AM</span><span class="st">Morning <span class="hr">Brixton &rarr; Epsom</span>: <span class="hr">Z2</span>.</span></li><li class="step"><span class="sn">PM</span><span class="st">Afternoon <span class="hr">Epsom &rarr; Brixton</span>: <span class="hr">Z2</span>.</span></li></ul></div><div class="divl"></div><div class="sb"><div class="stype">&#127947; KETTLEBELL EVENING</div><div class="kbl" onclick="goKB('C');event.stopPropagation()"><div><div class="kbl-t">Circuit C &mdash; Power</div><div class="kbl-s">KB Swing &middot; Clean &amp; Press &middot; Squat Pulse &middot; Get-Up</div></div><span class="kbl-a">&rsaquo;</span></div></div></div></div><div class="dcard" onclick="toggleDay(this)"><div class="dhead"><span class="dname">WEDNESDAY</span><span class="dtag tc">COMMUTE</span><span class="chv">&#8964;</span></div><div class="dbody"><div class="sb"><div class="stype">&#128692; COMMUTE &middot; HR BASED</div><div class="stit">Z2 In / Z4 Out</div><div data-chart="tc-p9-wed-am"></div><div data-chart="tc-p9-wed-pm"></div><ul class="steps"><li class="step"><span class="sn">AM</span><span class="st">Morning <span class="hr">Brixton &rarr; Epsom</span>: <span class="hr">Z2</span>.</span></li><li class="step"><span class="sn">PM</span><span class="st">Afternoon <span class="hr">Epsom &rarr; Brixton</span>: <span class="hr">Z4 push on clear stretches</span>.</span></li></ul></div></div></div><div class="dcard" onclick="toggleDay(this)"><div class="dhead"><span class="dname">THURSDAY</span><span class="dtag tm">COMMUTE + KB</span><span class="chv">&#8964;</span></div><div class="dbody"><div class="sb"><div class="stype">&#128692; COMMUTE &middot; HR BASED</div><div class="stit">Easy In / Z4 Out</div><div data-chart="tc-p9-thu-am"></div><div data-chart="tc-p9-thu-pm"></div><ul class="steps"><li class="step"><span class="sn">AM</span><span class="st">Morning <span class="hr">Brixton &rarr; Epsom</span>: <span class="hr">Z2</span>.</span></li><li class="step"><span class="sn">PM</span><span class="st">Afternoon <span class="hr">Epsom &rarr; Brixton</span>: <span class="hr">30 min Z4 163&ndash;170bpm</span>.</span></li></ul></div><div class="divl"></div><div class="sb"><div class="stype">&#127947; KETTLEBELL EVENING</div><div class="kbl" onclick="goKB('C');event.stopPropagation()"><div><div class="kbl-t">Circuit C &mdash; Power</div><div class="kbl-s">KB Swing &middot; Clean &amp; Press &middot; Squat Pulse &middot; Get-Up</div></div><span class="kbl-a">&rsaquo;</span></div></div></div></div><div class="dcard" onclick="toggleDay(this)"><div class="dhead"><span class="dname">FRIDAY</span><span class="dtag tx">REST</span><span class="chv">&#8964;</span></div><div class="dbody"><div class="sb"><div class="sdesc">Rest before weekend.</div></div></div></div><div class="dcard" onclick="toggleDay(this)"><div class="dhead"><span class="dname">SATURDAY</span><span class="dtag tc">RIDE &middot; POWER</span><span class="chv">&#8964;</span></div><div class="dbody"><div class="sb"><div class="stype">&#128692; WEEKEND RIDE &middot; POWER METER</div><div class="stit">Ride A &mdash; 2&times;20 Sweet Spot</div><div data-chart="tc-pk-satA"></div><ul class="steps"><li class="step"><span class="sn">WU</span><span class="st">15 min warm up.</span></li><li class="step"><span class="sn">SS1</span><span class="st">20 min at <span class="pw">205&ndash;215W</span>.</span></li><li class="step"><span class="sn">REC</span><span class="st">10 min easy.</span></li><li class="step"><span class="sn">SS2</span><span class="st">20 min at <span class="pw">205&ndash;215W</span>.</span></li><li class="step"><span class="sn">CD</span><span class="st">Cool down.</span></li></ul></div></div></div><div class="dcard" onclick="toggleDay(this)"><div class="dhead"><span class="dname">SUNDAY</span><span class="dtag tr">RUN</span><span class="chv">&#8964;</span></div><div class="dbody"><div class="sb"><div class="stype">&#127939; RUN</div><div class="stit">8&ndash;10km + Threshold</div><div data-chart="tc-pk-run"></div><ul class="steps"><li class="step"><span class="sn">EASY</span><span class="st">2km easy.</span></li><li class="step"><span class="sn">THR</span><span class="st">2&times;1km at <span class="hr">5:00/km</span>.</span></li><li class="step"><span class="sn">EASY</span><span class="st">Easy around them.</span></li></ul></div></div></div></div><div class="wcont" id="wk-p10"><div class="dcard" onclick="toggleDay(this)"><div class="dhead"><span class="dname">MONDAY</span><span class="dtag tx">REST</span><span class="chv">&#8964;</span></div><div class="dbody"><div class="sb"><div class="sdesc">Full rest.</div></div></div></div><div class="dcard" onclick="toggleDay(this)"><div class="dhead"><span class="dname">TUESDAY</span><span class="dtag tm">COMMUTE + KB</span><span class="chv">&#8964;</span></div><div class="dbody"><div class="sb"><div class="stype">&#128692; COMMUTE &middot; HR BASED</div><div class="stit">Z2 Both Ways</div><div data-chart="tc-p10-tu-am"></div><div data-chart="tc-p10-tu-pm"></div><ul class="steps"><li class="step"><span class="sn">AM</span><span class="st">Morning <span class="hr">Brixton &rarr; Epsom</span>: <span class="hr">Z2</span>.</span></li><li class="step"><span class="sn">PM</span><span class="st">Afternoon <span class="hr">Epsom &rarr; Brixton</span>: <span class="hr">Z2</span>.</span></li></ul></div><div class="divl"></div><div class="sb"><div class="stype">&#127947; KETTLEBELL EVENING</div><div class="kbl" onclick="goKB('C');event.stopPropagation()"><div><div class="kbl-t">Circuit C &mdash; Power</div><div class="kbl-s">KB Swing &middot; Clean &amp; Press &middot; Squat Pulse &middot; Get-Up</div></div><span class="kbl-a">&rsaquo;</span></div></div></div></div><div class="dcard" onclick="toggleDay(this)"><div class="dhead"><span class="dname">WEDNESDAY</span><span class="dtag tc">COMMUTE</span><span class="chv">&#8964;</span></div><div class="dbody"><div class="sb"><div class="stype">&#128692; COMMUTE &middot; HR BASED</div><div class="stit">Z2 In / Z4 Out</div><div data-chart="tc-p10-wed-am"></div><div data-chart="tc-p10-wed-pm"></div><ul class="steps"><li class="step"><span class="sn">AM</span><span class="st">Morning <span class="hr">Brixton &rarr; Epsom</span>: <span class="hr">Z2</span>.</span></li><li class="step"><span class="sn">PM</span><span class="st">Afternoon <span class="hr">Epsom &rarr; Brixton</span>: <span class="hr">Z4 push on clear stretches</span>.</span></li></ul></div></div></div><div class="dcard" onclick="toggleDay(this)"><div class="dhead"><span class="dname">THURSDAY</span><span class="dtag tm">COMMUTE + KB</span><span class="chv">&#8964;</span></div><div class="dbody"><div class="sb"><div class="stype">&#128692; COMMUTE &middot; HR BASED</div><div class="stit">Easy In / Z4 Out</div><div data-chart="tc-p10-thu-am"></div><div data-chart="tc-p10-thu-pm"></div><ul class="steps"><li class="step"><span class="sn">AM</span><span class="st">Morning <span class="hr">Brixton &rarr; Epsom</span>: <span class="hr">Z2</span>.</span></li><li class="step"><span class="sn">PM</span><span class="st">Afternoon <span class="hr">Epsom &rarr; Brixton</span>: <span class="hr">30 min Z4 163&ndash;170bpm</span>.</span></li></ul></div><div class="divl"></div><div class="sb"><div class="stype">&#127947; KETTLEBELL EVENING</div><div class="kbl" onclick="goKB('C');event.stopPropagation()"><div><div class="kbl-t">Circuit C &mdash; Power</div><div class="kbl-s">KB Swing &middot; Clean &amp; Press &middot; Squat Pulse &middot; Get-Up</div></div><span class="kbl-a">&rsaquo;</span></div></div></div></div><div class="dcard" onclick="toggleDay(this)"><div class="dhead"><span class="dname">FRIDAY</span><span class="dtag tx">REST</span><span class="chv">&#8964;</span></div><div class="dbody"><div class="sb"><div class="sdesc">Rest before weekend.</div></div></div></div><div class="dcard" onclick="toggleDay(this)"><div class="dhead"><span class="dname">SATURDAY</span><span class="dtag tc">RIDE &middot; POWER</span><span class="chv">&#8964;</span></div><div class="dbody"><div class="sb"><div class="stype">&#128692; WEEKEND RIDE &middot; POWER METER</div><div class="stit">Ride B &mdash; 2&times;10 Threshold</div><div data-chart="tc-pk-satB"></div><ul class="steps"><li class="step"><span class="sn">WU</span><span class="st">15 min warm up.</span></li><li class="step"><span class="sn">THR1</span><span class="st">10 min at <span class="pw">215&ndash;240W</span>.</span></li><li class="step"><span class="sn">REC</span><span class="st">8 min easy.</span></li><li class="step"><span class="sn">THR2</span><span class="st">10 min at <span class="pw">215&ndash;240W</span>.</span></li><li class="step"><span class="sn">SS</span><span class="st">15 min sweet spot.</span></li><li class="step"><span class="sn">CD</span><span class="st">Cool down.</span></li></ul></div></div></div><div class="dcard" onclick="toggleDay(this)"><div class="dhead"><span class="dname">SUNDAY</span><span class="dtag tr">RUN</span><span class="chv">&#8964;</span></div><div class="dbody"><div class="sb"><div class="stype">&#127939; RUN</div><div class="stit">8&ndash;10km steady</div><div data-chart="tc-pk-run10"></div><ul class="steps"><li class="step"><span class="sn">RUN</span><span class="st">Steady 8&ndash;10km, optional tempo km.</span></li></ul></div></div></div></div><div class="wcont" id="wk-p11"><div class="note">Week 11 repeats the Week 9 sweet-spot pattern at the top of your range.</div><div class="dcard" onclick="toggleDay(this)"><div class="dhead"><span class="dname">MONDAY</span><span class="dtag tx">REST</span><span class="chv">&#8964;</span></div><div class="dbody"><div class="sb"><div class="sdesc">Full rest.</div></div></div></div><div class="dcard" onclick="toggleDay(this)"><div class="dhead"><span class="dname">TUESDAY</span><span class="dtag tm">COMMUTE + KB</span><span class="chv">&#8964;</span></div><div class="dbody"><div class="sb"><div class="stype">&#128692; COMMUTE &middot; HR BASED</div><div class="stit">Z2 Both Ways</div><div data-chart="tc-p9-tu-am"></div><div data-chart="tc-p9-tu-pm"></div><ul class="steps"><li class="step"><span class="sn">AM</span><span class="st">Morning <span class="hr">Brixton &rarr; Epsom</span>: <span class="hr">Z2</span>.</span></li><li class="step"><span class="sn">PM</span><span class="st">Afternoon <span class="hr">Epsom &rarr; Brixton</span>: <span class="hr">Z2</span>.</span></li></ul></div><div class="divl"></div><div class="sb"><div class="stype">&#127947; KETTLEBELL EVENING</div><div class="kbl" onclick="goKB('C');event.stopPropagation()"><div><div class="kbl-t">Circuit C &mdash; Power</div><div class="kbl-s">KB Swing &middot; Clean &amp; Press &middot; Squat Pulse &middot; Get-Up</div></div><span class="kbl-a">&rsaquo;</span></div></div></div></div><div class="dcard" onclick="toggleDay(this)"><div class="dhead"><span class="dname">WEDNESDAY</span><span class="dtag tc">COMMUTE</span><span class="chv">&#8964;</span></div><div class="dbody"><div class="sb"><div class="stype">&#128692; COMMUTE &middot; HR BASED</div><div class="stit">Z2 In / Z4 Out</div><div data-chart="tc-p9-wed-am"></div><div data-chart="tc-p9-wed-pm"></div><ul class="steps"><li class="step"><span class="sn">AM</span><span class="st">Morning <span class="hr">Brixton &rarr; Epsom</span>: <span class="hr">Z2</span>.</span></li><li class="step"><span class="sn">PM</span><span class="st">Afternoon <span class="hr">Epsom &rarr; Brixton</span>: <span class="hr">Z4 push on clear stretches</span>.</span></li></ul></div></div></div><div class="dcard" onclick="toggleDay(this)"><div class="dhead"><span class="dname">THURSDAY</span><span class="dtag tm">COMMUTE + KB</span><span class="chv">&#8964;</span></div><div class="dbody"><div class="sb"><div class="stype">&#128692; COMMUTE &middot; HR BASED</div><div class="stit">Easy In / Z4 Out</div><div data-chart="tc-p9-thu-am"></div><div data-chart="tc-p9-thu-pm"></div><ul class="steps"><li class="step"><span class="sn">AM</span><span class="st">Morning <span class="hr">Brixton &rarr; Epsom</span>: <span class="hr">Z2</span>.</span></li><li class="step"><span class="sn">PM</span><span class="st">Afternoon <span class="hr">Epsom &rarr; Brixton</span>: <span class="hr">30 min Z4 163&ndash;170bpm</span>.</span></li></ul></div><div class="divl"></div><div class="sb"><div class="stype">&#127947; KETTLEBELL EVENING</div><div class="kbl" onclick="goKB('C');event.stopPropagation()"><div><div class="kbl-t">Circuit C &mdash; Power</div><div class="kbl-s">KB Swing &middot; Clean &amp; Press &middot; Squat Pulse &middot; Get-Up</div></div><span class="kbl-a">&rsaquo;</span></div></div></div></div><div class="dcard" onclick="toggleDay(this)"><div class="dhead"><span class="dname">FRIDAY</span><span class="dtag tx">REST</span><span class="chv">&#8964;</span></div><div class="dbody"><div class="sb"><div class="sdesc">Rest before weekend.</div></div></div></div><div class="dcard" onclick="toggleDay(this)"><div class="dhead"><span class="dname">SATURDAY</span><span class="dtag tc">RIDE &middot; POWER</span><span class="chv">&#8964;</span></div><div class="dbody"><div class="sb"><div class="stype">&#128692; WEEKEND RIDE &middot; POWER METER</div><div class="stit">Ride A &mdash; 2&times;20 Sweet Spot</div><div data-chart="tc-pk-satA"></div><ul class="steps"><li class="step"><span class="sn">WU</span><span class="st">15 min warm up.</span></li><li class="step"><span class="sn">SS1</span><span class="st">20 min at <span class="pw">205&ndash;215W</span>.</span></li><li class="step"><span class="sn">REC</span><span class="st">10 min easy.</span></li><li class="step"><span class="sn">SS2</span><span class="st">20 min at <span class="pw">205&ndash;215W</span>.</span></li><li class="step"><span class="sn">CD</span><span class="st">Cool down.</span></li></ul></div></div></div><div class="dcard" onclick="toggleDay(this)"><div class="dhead"><span class="dname">SUNDAY</span><span class="dtag tr">RUN</span><span class="chv">&#8964;</span></div><div class="dbody"><div class="sb"><div class="stype">&#127939; RUN</div><div class="stit">8&ndash;10km + Threshold</div><div data-chart="tc-pk-run"></div><ul class="steps"><li class="step"><span class="sn">EASY</span><span class="st">2km easy.</span></li><li class="step"><span class="sn">THR</span><span class="st">2&times;1km at <span class="hr">5:00/km</span>.</span></li><li class="step"><span class="sn">EASY</span><span class="st">Easy around them.</span></li></ul></div></div></div></div><div class="wcont" id="wk-p12"><div class="note"><strong>Week 12 &mdash; FTP retest.</strong> Replace Saturday's ride with the test below.</div><div class="dcard" onclick="toggleDay(this)"><div class="dhead"><span class="dname">SATURDAY</span><span class="dtag tc">FTP TEST</span><span class="chv">&#8964;</span></div><div class="dbody"><div class="sb"><div class="stype">&#128692; WEEKEND RIDE &middot; POWER METER</div><div class="stit">20 min FTP Test</div><div data-chart="tc-pk-ftp"></div><ul class="steps"><li class="step"><span class="sn">WU</span><span class="st">20 min progressive warm up.</span></li><li class="step"><span class="sn">TEST</span><span class="st">20 min ALL OUT solo effort.</span></li><li class="step"><span class="sn">CALC</span><span class="st">FTP = average power &times; 0.95.</span></li><li class="step"><span class="sn">CD</span><span class="st">10 min easy cool down.</span></li></ul></div></div></div></div></div><div class="pcont" id="ph-recover"><div class="note"><strong>Week 13 &mdash; Full Recovery.</strong> Z2 max on rides. One easy 5km. No KB. Adaptation happens here.</div><div class="wnav"><button class="wbtn active" onclick="switchWeek('r13',this,'recover')">Week 13</button></div><div class="wcont active" id="wk-r13"><div class="dcard" onclick="toggleDay(this)"><div class="dhead"><span class="dname">MONDAY</span><span class="dtag tx">REST</span><span class="chv">&#8964;</span></div><div class="dbody"><div class="sb"><div class="sdesc">Full rest.</div></div></div></div><div class="dcard" onclick="toggleDay(this)"><div class="dhead"><span class="dname">TUESDAY</span><span class="dtag tc">EASY RIDE</span><span class="chv">&#8964;</span></div><div class="dbody"><div class="sb"><div class="stype">&#128692; COMMUTE &middot; HR BASED</div><div class="stit">Z2 by Feel</div><div data-chart="tc-rec-tu-am"></div><div data-chart="tc-rec-tu-pm"></div><ul class="steps"><li class="step"><span class="sn">AM</span><span class="st">Morning <span class="hr">Brixton &rarr; Epsom</span>: <span class="hr">Z2 max</span>, ride by feel.</span></li><li class="step"><span class="sn">PM</span><span class="st">Afternoon <span class="hr">Epsom &rarr; Brixton</span>: <span class="hr">Z2 max</span>.</span></li></ul></div></div></div><div class="dcard" onclick="toggleDay(this)"><div class="dhead"><span class="dname">WEDNESDAY</span><span class="dtag tx">REST</span><span class="chv">&#8964;</span></div><div class="dbody"><div class="sb"><div class="sdesc">Full rest. Walk if you like.</div></div></div></div><div class="dcard" onclick="toggleDay(this)"><div class="dhead"><span class="dname">THURSDAY</span><span class="dtag tc">EASY RIDE</span><span class="chv">&#8964;</span></div><div class="dbody"><div class="sb"><div class="stype">&#128692; COMMUTE &middot; HR BASED</div><div class="stit">Z2 by Feel</div><div data-chart="tc-rec-thu-am"></div><div data-chart="tc-rec-thu-pm"></div><ul class="steps"><li class="step"><span class="sn">AM</span><span class="st">Morning <span class="hr">Brixton &rarr; Epsom</span>: <span class="hr">Z2 max</span>.</span></li><li class="step"><span class="sn">PM</span><span class="st">Afternoon <span class="hr">Epsom &rarr; Brixton</span>: <span class="hr">Z2 max</span>.</span></li></ul></div></div></div><div class="dcard" onclick="toggleDay(this)"><div class="dhead"><span class="dname">FRIDAY</span><span class="dtag tx">REST</span><span class="chv">&#8964;</span></div><div class="dbody"><div class="sb"><div class="sdesc">Full rest.</div></div></div></div><div class="dcard" onclick="toggleDay(this)"><div class="dhead"><span class="dname">SATURDAY</span><span class="dtag tx">REST</span><span class="chv">&#8964;</span></div><div class="dbody"><div class="sb"><div class="sdesc">No ride. Optional gentle spin only.</div></div></div></div><div class="dcard" onclick="toggleDay(this)"><div class="dhead"><span class="dname">SUNDAY</span><span class="dtag tr">RUN</span><span class="chv">&#8964;</span></div><div class="dbody"><div class="sb"><div class="stype">&#127939; RUN</div><div class="stit">Easy 5km</div><div data-chart="tc-rec-run"></div><ul class="steps"><li class="step"><span class="sn">RUN</span><span class="st">One easy 5km jog, fully relaxed.</span></li></ul></div></div></div></div><div class="note">After recovery, retest FTP then begin a new block from Develop with updated zones.</div></div>
+  <div style="margin-top:22px">
+    <div class="stitle" style="color:var(--cy);font-size:20px">WEEKLY TEMPLATE</div>
+    <div class="wtbl" id="wtbl">
+      <div class="wt d">MON</div><div class="wt">&#127807; Full rest</div>
+      <div class="wt d">TUE</div><div class="wt"><span style="color:var(--cy)">&#128692; Commute</span> Z2 both &middot; <span style="color:var(--kb)">&#127947; KB</span></div>
+      <div class="wt d">WED</div><div class="wt"><span style="color:var(--cy)">&#128692; Commute</span> Z2 in / Z3 out</div>
+      <div class="wt d">THU</div><div class="wt"><span style="color:var(--cy)">&#128692; Commute</span> Z2 in / Quality out &middot; <span style="color:var(--kb)">&#127947; KB</span></div>
+      <div class="wt d">FRI</div><div class="wt">&#127807; Rest / walk</div>
+      <div class="wt d">SAT</div><div class="wt"><span style="color:var(--cy)">&#128692; Structured ride</span> &middot; power meter</div>
+      <div class="wt d">SUN</div><div class="wt"><span style="color:var(--run)">&#127939; Run</span> 5&ndash;10km</div>
+    </div>
+  </div>
+</div>
+</div>
+<div class="page" id="pg-kb">
+  <div class="hdr" style="padding:22px 20px 18px"><div class="htag">Exercises</div><h1 style="font-size:36px">KETTLEBELL<br><span>CIRCUITS</span></h1></div>
+  <div class="kb-back" onclick="goMain()">&#8592; Back to Plan</div>
+  <div id="kb-cont" style="padding-top:12px"></div>
+</div>
+<script>
+
+
+/* ===== SWIPEABLE ZONE DECK ===== */
+let curSlide=0; const NS=3;
+const track=document.getElementById('ztrack');
+function renderSlide(){
+  track.style.transform='translateX(-'+(curSlide*100)+'%)';
+  document.querySelectorAll('.zdot').forEach((d,i)=>d.classList.toggle('active',i===curSlide));
+}
+function goSlide(n){curSlide=((n%NS)+NS)%NS;renderSlide();}
+// touch swipe
+let sx=0,sdx=0,drag=false;
+const deck=document.getElementById('zdeck');
+deck.addEventListener('touchstart',e=>{sx=e.touches[0].clientX;sdx=0;drag=true;},{passive:true});
+deck.addEventListener('touchmove',e=>{if(drag)sdx=e.touches[0].clientX-sx;},{passive:true});
+deck.addEventListener('touchend',()=>{if(!drag)return;drag=false;if(Math.abs(sdx)>40){if(sdx<0)goSlide(curSlide+1);else goSlide(curSlide-1);}});
+
+/* ===== PHASE / ZONE DATA ===== */
+const PD={
+  build:{label:'Build Phase (Wks 1-4)',desc:'Commutes Z2. One Z3 block Thu. Weekend aerobic base. Run easy.',hr:{z2:75,z3:20,z4:5,z5:0},pw:{z2:80,z3:15,z4:5,z5:0},rn:{z2:96,z3:4,z4:0}},
+  develop:{label:'Develop Phase (Wks 5-8)',desc:'2x20 sweet spot weekends. Thu return Z4. Run adds tempo. FTP building.',hr:{z2:52,z3:24,z4:20,z5:4},pw:{z2:44,z3:34,z4:18,z5:4},rn:{z2:80,z3:14,z4:6}},
+  peak:{label:'Peak Phase (Wks 9-12)',desc:'Threshold intervals. Commutes quality Z4. Run 2x1km threshold. FTP retest.',hr:{z2:38,z3:22,z4:30,z5:10},pw:{z2:32,z3:26,z4:30,z5:12},rn:{z2:62,z3:22,z4:16}},
+  recover:{label:'Recovery Week (Wk 13)',desc:'Everything Z2. No structure. Body absorbs the block.',hr:{z2:98,z3:2,z4:0,z5:0},pw:{z2:100,z3:0,z4:0,z5:0},rn:{z2:100,z3:0,z4:0}}
+};
+const ZC={z2:'var(--z2)',z3:'var(--z3)',z4:'var(--z4)',z5:'var(--z5)'};
+function updateZones(ph){
+  const d=PD[ph];if(!d)return;
+  document.getElementById('pctx').innerHTML='<strong>'+d.label+'</strong>'+d.desc;
+  function set(p,data,keys){keys.forEach(k=>{const pct=data[k]||0;const b=document.getElementById(p+k+'b');const t=document.getElementById(p+k+'t');if(b)b.style.width=Math.max(pct,2)+'%';if(t){if(pct>0){t.textContent=pct+'%';t.style.background=ZC[k];t.classList.add('on');}else{t.textContent='\u2014';t.style.background='';t.classList.remove('on');}}});}
+  set('hr',d.hr,['z2','z3','z4','z5']);set('pw',d.pw,['z2','z3','z4','z5']);set('rn',d.rn,['z2','z3','z4']);
+}
+function switchPhase(id,el){
+  document.querySelectorAll('.pcont').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.ptab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('ph-'+id).classList.add('active');el.classList.add('active');updateZones(id);
+var fw={build:'b1',develop:'d5',peak:'p9',recover:'r13'}[id];if(fw)renderTemplate(fw);}
+function switchWeek(id,btn,ph){
+  const pc=document.getElementById('ph-'+ph);
+  pc.querySelectorAll('.wcont').forEach(w=>w.classList.remove('active'));
+  pc.querySelectorAll('.wbtn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('wk-'+id).classList.add('active');btn.classList.add('active');
+renderTemplate(id);}
+function toggleDay(c){c.classList.toggle('open');}
+
+/* ===== PAGE NAV ===== */
+function goKB(circ){
+  document.getElementById('pg-main').classList.remove('active');
+  document.getElementById('pg-kb').classList.add('active');
+  document.querySelectorAll('.kct-bd').forEach(b=>{b.classList.remove('open');b.previousElementSibling.querySelector('.chv').style.transform='';});
+  const t=document.getElementById('kct-'+circ);
+  if(t){t.classList.add('open');t.previousElementSibling.querySelector('.chv').style.transform='rotate(180deg)';}
+  window.scrollTo(0,0);
+}
+function goMain(){document.getElementById('pg-kb').classList.remove('active');document.getElementById('pg-main').classList.add('active');window.scrollTo(0,0);}
+function toggleKCT(el){const b=el.nextElementSibling;const open=b.classList.toggle('open');el.querySelector('.chv').style.transform=open?'rotate(180deg)':'';}
+
+/* ===== TIME-SCALED BAR CHARTS ===== */
+const Z2='var(--z2)',Z3='var(--z3)',Z4='var(--z4)',Z5='var(--z5)',ZG='#2a2a3a';
+const CHARTS={'tc-pk-satA':{t:'Saturday A &middot; 2x20 sweet spot',s:[{m:15,h:28,c:Z2,l:'WU'},{m:12,h:48,c:Z2,l:'Z2'},{m:20,h:84,c:Z3,l:'SS 20m'},{m:10,h:34,c:Z2,l:'rec'},{m:20,h:84,c:Z3,l:'SS 20m'},{m:12,h:40,c:Z2,l:'Z2'},{m:10,h:18,c:Z2,l:'CD'}],lg:[[Z2,'Z2'],[Z3,'SS 205-215W']]},
+  'tc-pk-satB':{t:'Saturday B &middot; 2x10 threshold',s:[{m:15,h:28,c:Z2,l:'WU'},{m:10,h:48,c:Z2,l:'Z2'},{m:10,h:96,c:Z4,l:'THR 10m'},{m:8,h:32,c:Z2,l:'rec'},{m:10,h:96,c:Z4,l:'THR 10m'},{m:8,h:32,c:Z2,l:'rec'},{m:15,h:80,c:Z3,l:'SS 15m'},{m:12,h:18,c:Z2,l:'CD'}],lg:[[Z2,'Z2'],[Z3,'SS'],[Z4,'THR 215-240W']]},
+  'tc-d5-thu-am':{t:'AM &middot; Brixton to Epsom',s:[{m:42,h:52,c:Z2,l:'Steady ride in'}],lg:[[Z2,'~40-45 min tempo']]},
+  'tc-d5-thu-pm':{t:'PM &middot; Epsom to Brixton',s:[{m:11,h:46,c:Z2,l:'Z2'},{m:22,h:86,c:Z4,l:'Z4 sustained'},{m:9,h:40,c:Z2,l:'Z2'}],lg:[[Z2,'Z2'],[Z4,'Z4 163-170bpm']]},
+  'tc-d5-tu-am':{t:'AM &middot; Brixton to Epsom',s:[{m:42,h:52,c:Z2,l:'Steady ride in'}],lg:[[Z2,'~40-45 min tempo']]},
+  'tc-d5-tu-pm':{t:'PM &middot; Epsom to Brixton',s:[{m:42,h:50,c:Z2,l:'PM Z2'}],lg:[[Z2,'Z2']]},
+  'tc-d5-wed-am':{t:'AM &middot; Brixton to Epsom',s:[{m:42,h:52,c:Z2,l:'Steady ride in'}],lg:[[Z2,'~40-45 min tempo']]},
+  'tc-d5-wed-pm':{t:'PM &middot; Epsom to Brixton',s:[{m:42,h:50,c:Z2,l:'PM Z2'}],lg:[[Z2,'Z2']]},
+  'tc-d7-thu-am':{t:'AM &middot; Brixton to Epsom',s:[{m:42,h:52,c:Z2,l:'Steady ride in'}],lg:[[Z2,'~40-45 min tempo']]},
+  'tc-d7-thu-pm':{t:'PM &middot; Epsom to Brixton',s:[{m:11,h:46,c:Z2,l:'Z2'},{m:22,h:86,c:Z4,l:'Z4 blocks'},{m:9,h:40,c:Z2,l:'Z2'}],lg:[[Z2,'Z2'],[Z4,'Z4']]},
+  'tc-d7-tu-am':{t:'AM &middot; Brixton to Epsom',s:[{m:42,h:52,c:Z2,l:'Steady ride in'}],lg:[[Z2,'~40-45 min tempo']]},
+  'tc-d7-tu-pm':{t:'PM &middot; Epsom to Brixton',s:[{m:42,h:50,c:Z2,l:'PM Z2'}],lg:[[Z2,'Z2']]},
+  'tc-d7-wed-am':{t:'AM &middot; Brixton to Epsom',s:[{m:42,h:52,c:Z2,l:'Steady ride in'}],lg:[[Z2,'~40-45 min tempo']]},
+  'tc-d7-wed-pm':{t:'PM &middot; Epsom to Brixton',s:[{m:42,h:50,c:Z2,l:'PM Z2'}],lg:[[Z2,'Z2']]},
+  'tc-p10-thu-am':{t:'AM &middot; Brixton to Epsom',s:[{m:42,h:52,c:Z2,l:'Steady ride in'}],lg:[[Z2,'~40-45 min tempo']]},
+  'tc-p10-thu-pm':{t:'PM &middot; Epsom to Brixton',s:[{m:6,h:46,c:Z2,l:'Z2'},{m:30,h:90,c:Z4,l:'Z4'},{m:6,h:40,c:Z2,l:'Z2'}],lg:[[Z2,'Z2'],[Z4,'Z4']]},
+  'tc-p10-tu-am':{t:'AM &middot; Brixton to Epsom',s:[{m:42,h:52,c:Z2,l:'Steady ride in'}],lg:[[Z2,'~40-45 min tempo']]},
+  'tc-p10-tu-pm':{t:'PM &middot; Epsom to Brixton',s:[{m:42,h:50,c:Z2,l:'PM Z2'}],lg:[[Z2,'Z2']]},
+  'tc-p10-wed-am':{t:'AM &middot; Brixton to Epsom',s:[{m:42,h:52,c:Z2,l:'Steady ride in'}],lg:[[Z2,'~40-45 min tempo']]},
+  'tc-p10-wed-pm':{t:'PM &middot; Epsom to Brixton',s:[{m:20,h:80,c:Z4,l:'PM Z4'}],lg:[[Z2,'Z2'],[Z4,'Z4']]},
+  'tc-p9-thu-am':{t:'AM &middot; Brixton to Epsom',s:[{m:42,h:52,c:Z2,l:'Steady ride in'}],lg:[[Z2,'~40-45 min tempo']]},
+  'tc-p9-thu-pm':{t:'PM &middot; Epsom to Brixton',s:[{m:6,h:46,c:Z2,l:'Z2'},{m:30,h:90,c:Z4,l:'Z4 sustained'},{m:6,h:40,c:Z2,l:'Z2'}],lg:[[Z2,'Z2'],[Z4,'Z4 163-170']]},
+  'tc-p9-tu-am':{t:'AM &middot; Brixton to Epsom',s:[{m:42,h:52,c:Z2,l:'Steady ride in'}],lg:[[Z2,'~40-45 min tempo']]},
+  'tc-p9-tu-pm':{t:'PM &middot; Epsom to Brixton',s:[{m:42,h:50,c:Z2,l:'PM Z2'}],lg:[[Z2,'Z2']]},
+  'tc-p9-wed-am':{t:'AM &middot; Brixton to Epsom',s:[{m:42,h:52,c:Z2,l:'Steady ride in'}],lg:[[Z2,'~40-45 min tempo']]},
+  'tc-p9-wed-pm':{t:'PM &middot; Epsom to Brixton',s:[{m:20,h:80,c:Z4,l:'PM Z4 push'}],lg:[[Z2,'Z2'],[Z4,'Z4']]},
+  'tc-rec-thu-am':{t:'AM &middot; Brixton to Epsom',s:[{m:42,h:52,c:Z2,l:'Steady ride in'}],lg:[[Z2,'~40-45 min tempo']]},
+  'tc-rec-thu-pm':{t:'PM &middot; Epsom to Brixton',s:[{m:42,h:38,c:Z2,l:'PM Z2'}],lg:[[Z2,'Z2 by feel']]},
+  'tc-rec-tu-am':{t:'AM &middot; Brixton to Epsom',s:[{m:42,h:52,c:Z2,l:'Steady ride in'}],lg:[[Z2,'~40-45 min tempo']]},
+  'tc-rec-tu-pm':{t:'PM &middot; Epsom to Brixton',s:[{m:42,h:38,c:Z2,l:'PM Z2'}],lg:[[Z2,'Z2 by feel']]},
+  'tc-th-b1-am':{t:'AM &middot; Brixton to Epsom',s:[{m:42,h:52,c:Z2,l:'Steady ride in'}],lg:[[Z2,'~40-45 min tempo']]},
+  'tc-th-b1-pm':{t:'PM &middot; Epsom to Brixton',s:[{m:27,h:48,c:Z2,l:'Z2'},{m:5,h:72,c:Z3,l:'Z3 5m'},{m:10,h:38,c:Z2,l:'Z2'}],lg:[[Z2,'Z2'],[Z3,'Z3 tempo']]},
+  'tc-th-b2-am':{t:'AM &middot; Brixton to Epsom',s:[{m:42,h:52,c:Z2,l:'Steady ride in'}],lg:[[Z2,'~40-45 min tempo']]},
+  'tc-th-b2-pm':{t:'PM &middot; Epsom to Brixton',s:[{m:13,h:46,c:Z2,l:'Z2'},{m:5,h:72,c:Z3,l:'Z3'},{m:11,h:38,c:Z2,l:'rec'},{m:5,h:72,c:Z3,l:'Z3'},{m:9,h:30,c:Z2,l:'Z2'}],lg:[[Z2,'Z2'],[Z3,'Z3 x2']]},
+  'tc-th-b3-am':{t:'AM &middot; Brixton to Epsom',s:[{m:42,h:52,c:Z2,l:'Steady ride in'}],lg:[[Z2,'~40-45 min tempo']]},
+  'tc-th-b3-pm':{t:'PM &middot; Epsom to Brixton',s:[{m:13,h:46,c:Z2,l:'Z2'},{m:5,h:72,c:Z3,l:'Z3'},{m:11,h:38,c:Z2,l:'rec'},{m:5,h:72,c:Z3,l:'Z3'},{m:9,h:30,c:Z2,l:'Z2'}],lg:[[Z2,'Z2'],[Z3,'Z3 x2']]},
+  'tc-th-b4-am':{t:'AM &middot; Brixton to Epsom',s:[{m:42,h:52,c:Z2,l:'Steady ride in'}],lg:[[Z2,'~40-45 min tempo']]},
+  'tc-th-b4-pm':{t:'PM &middot; Epsom to Brixton',s:[{m:42,h:42,c:Z2,l:'Z2 only'}],lg:[[Z2,'Z2 only']]},
+  'tc-tu-b1-am':{t:'AM &middot; Brixton to Epsom',s:[{m:42,h:52,c:Z2,l:'Steady ride in'}],lg:[[Z2,'~40-45 min tempo']]},
+  'tc-tu-b1-pm':{t:'PM &middot; Epsom to Brixton',s:[{m:42,h:50,c:Z2,l:'PM Z2'}],lg:[[Z2,'Z2 <145bpm']]},
+  'tc-tu-b2-am':{t:'AM &middot; Brixton to Epsom',s:[{m:42,h:52,c:Z2,l:'Steady ride in'}],lg:[[Z2,'~40-45 min tempo']]},
+  'tc-tu-b2-pm':{t:'PM &middot; Epsom to Brixton',s:[{m:42,h:50,c:Z2,l:'PM Z2'}],lg:[[Z2,'Z2']]},
+  'tc-tu-b3-am':{t:'AM &middot; Brixton to Epsom',s:[{m:42,h:52,c:Z2,l:'Steady ride in'}],lg:[[Z2,'~40-45 min tempo']]},
+  'tc-tu-b3-pm':{t:'PM &middot; Epsom to Brixton',s:[{m:42,h:50,c:Z2,l:'PM Z2'}],lg:[[Z2,'Z2']]},
+  'tc-tu-b4-am':{t:'AM &middot; Brixton to Epsom',s:[{m:42,h:52,c:Z2,l:'Steady ride in'}],lg:[[Z2,'~40-45 min tempo']]},
+  'tc-tu-b4-pm':{t:'PM &middot; Epsom to Brixton',s:[{m:42,h:42,c:Z2,l:'PM Z2'}],lg:[[Z2,'Z2 recovery']]},
+  'tc-wed-b2-am':{t:'AM &middot; Brixton to Epsom',s:[{m:42,h:52,c:Z2,l:'Steady ride in'}],lg:[[Z2,'~40-45 min tempo']]},
+  'tc-wed-b2-pm':{t:'PM &middot; Epsom to Brixton',s:[{m:42,h:50,c:Z2,l:'PM Z2'}],lg:[[Z2,'Z2']]},
+  'tc-wed-b3-am':{t:'AM &middot; Brixton to Epsom',s:[{m:42,h:52,c:Z2,l:'Steady ride in'}],lg:[[Z2,'~40-45 min tempo']]},
+  'tc-wed-b3-pm':{t:'PM &middot; Epsom to Brixton',s:[{m:42,h:50,c:Z2,l:'PM Z2'}],lg:[[Z2,'Z2']]},
+  
+  'tc-tu-b1':{t:'Tue commute - Z2 both ways',s:[{m:20,h:50,c:Z2,l:'AM Z2'},{m:20,h:50,c:Z2,l:'PM Z2'}],lg:[[Z2,'Z2 <145bpm']]},
+  'tc-th-b1':{t:'Thu commute - easy AM / Z3 PM',s:[{m:20,h:48,c:Z2,l:'AM Z2'},{m:13,h:48,c:Z2,l:'PM Z2'},{m:5,h:72,c:Z3,l:'Z3 5m'},{m:5,h:38,c:Z2,l:'Z2'}],lg:[[Z2,'Z2'],[Z3,'Z3 tempo']]},
+  'tc-sat-w1':{t:'Saturday - aerobic base',s:[{m:15,h:30,c:Z2,l:'WU'},{m:90,h:52,c:Z2,l:'Z2 140-167W'},{m:15,h:20,c:Z2,l:'CD'}],lg:[[Z2,'Z2 140-167W']]},
+  'tc-sun-w1':{t:'Sunday - easy 5km',s:[{m:5,h:28,c:Z2,l:'WU'},{m:18,h:48,c:Z2,l:'Easy'},{m:5,h:22,c:Z2,l:'CD'}],lg:[[Z2,'Easy <155bpm']]},
+  'tc-tu-b2':{t:'Tue commute - Z2 both ways',s:[{m:20,h:50,c:Z2,l:'AM Z2'},{m:20,h:50,c:Z2,l:'PM Z2'}],lg:[[Z2,'Z2']]},
+  'tc-wed-b2':{t:'Wed commute - Z2 both ways',s:[{m:20,h:50,c:Z2,l:'AM Z2'},{m:20,h:50,c:Z2,l:'PM Z2'}],lg:[[Z2,'Z2']]},
+  'tc-th-b2':{t:'Thu commute - 2x5 min Z3 PM',s:[{m:20,h:48,c:Z2,l:'AM Z2'},{m:6,h:46,c:Z2,l:'Z2'},{m:5,h:72,c:Z3,l:'Z3'},{m:5,h:38,c:Z2,l:'rec'},{m:5,h:72,c:Z3,l:'Z3'},{m:4,h:30,c:Z2,l:'Z2'}],lg:[[Z2,'Z2'],[Z3,'Z3 x2']]},
+  'tc-sat-w2':{t:'Saturday - 2.5hr base',s:[{m:15,h:30,c:Z2,l:'WU'},{m:120,h:52,c:Z2,l:'Z2 140-167W'},{m:15,h:20,c:Z2,l:'CD'}],lg:[[Z2,'Z2 throughout']]},
+  'tc-sun-w1b2':{t:'Sunday - easy 5km',s:[{m:5,h:28,c:Z2,l:'WU'},{m:18,h:48,c:Z2,l:'Easy'},{m:5,h:22,c:Z2,l:'CD'}],lg:[[Z2,'Easy']]},
+  'tc-tu-b3':{t:'Tue commute - Z2 both ways',s:[{m:20,h:50,c:Z2,l:'AM Z2'},{m:20,h:50,c:Z2,l:'PM Z2'}],lg:[[Z2,'Z2']]},
+  'tc-wed-b3':{t:'Wed commute - Z2 both ways',s:[{m:20,h:50,c:Z2,l:'AM Z2'},{m:20,h:50,c:Z2,l:'PM Z2'}],lg:[[Z2,'Z2']]},
+  'tc-th-b3':{t:'Thu commute - 2x5 min Z3',s:[{m:20,h:48,c:Z2,l:'AM Z2'},{m:6,h:46,c:Z2,l:'Z2'},{m:5,h:72,c:Z3,l:'Z3'},{m:5,h:38,c:Z2,l:'rec'},{m:5,h:72,c:Z3,l:'Z3'},{m:4,h:30,c:Z2,l:'Z2'}],lg:[[Z2,'Z2'],[Z3,'Z3 x2']]},
+  'tc-sat-w3':{t:'Saturday - sweet spot intro',s:[{m:15,h:30,c:Z2,l:'WU'},{m:30,h:50,c:Z2,l:'Z2'},{m:20,h:80,c:Z3,l:'SS 20m'},{m:30,h:50,c:Z2,l:'Z2'},{m:15,h:20,c:Z2,l:'CD'}],lg:[[Z2,'Z2'],[Z3,'SS 189-205W']]},
+  'tc-sun-w3':{t:'Sunday - easy 7km',s:[{m:5,h:28,c:Z2,l:'WU'},{m:28,h:46,c:Z2,l:'Easy'},{m:5,h:22,c:Z2,l:'CD'}],lg:[[Z2,'Easy']]},
+  'tc-tu-b4':{t:'Tue commute - Z2 easy',s:[{m:20,h:42,c:Z2,l:'AM Z2'},{m:20,h:42,c:Z2,l:'PM Z2'}],lg:[[Z2,'Z2 recovery']]},
+  'tc-th-b4':{t:'Thu commute - Z2 only',s:[{m:20,h:42,c:Z2,l:'AM Z2'},{m:20,h:42,c:Z2,l:'PM Z2'}],lg:[[Z2,'Z2 only']]},
+  'tc-sat-w4':{t:'Saturday - easy 90 min',s:[{m:90,h:40,c:Z2,l:'Z2 only - no intervals'}],lg:[[Z2,'Z2 max']]},
+  'tc-sun-w4':{t:'Sunday - easy 5km',s:[{m:28,h:28,c:Z2,l:'Easy 5km'}],lg:[[Z2,'Easy']]},
+  /* DEVELOP */
+  'tc-d5-tu':{t:'Tue commute - Z2',s:[{m:20,h:50,c:Z2,l:'AM Z2'},{m:20,h:50,c:Z2,l:'PM Z2'}],lg:[[Z2,'Z2']]},
+  'tc-d5-wed':{t:'Wed commute - Z2',s:[{m:20,h:50,c:Z2,l:'AM Z2'},{m:20,h:50,c:Z2,l:'PM Z2'}],lg:[[Z2,'Z2']]},
+  'tc-d5-thu':{t:'Thu commute - Z4 sustained PM',s:[{m:20,h:48,c:Z2,l:'AM Z2'},{m:8,h:46,c:Z2,l:'Z2'},{m:22,h:86,c:Z4,l:'Z4 sustained'},{m:6,h:40,c:Z2,l:'Z2'}],lg:[[Z2,'Z2'],[Z4,'Z4 163-170bpm']]},
+  'tc-dev-sat1':{t:'Saturday - 2x20 sweet spot',s:[{m:15,h:28,c:Z2,l:'WU'},{m:15,h:48,c:Z2,l:'Z2'},{m:20,h:82,c:Z3,l:'SS 20m'},{m:10,h:36,c:Z2,l:'rec'},{m:20,h:82,c:Z3,l:'SS 20m'},{m:15,h:40,c:Z2,l:'Z2'},{m:10,h:18,c:Z2,l:'CD'}],lg:[[Z2,'Z2'],[Z3,'SS 195-211W']]},
+  'tc-dev-run':{t:'Sunday - easy 8km',s:[{m:6,h:28,c:Z2,l:'WU'},{m:36,h:46,c:Z2,l:'Easy'},{m:5,h:22,c:Z2,l:'CD'}],lg:[[Z2,'Easy']]},
+  'tc-d7-tu':{t:'Tue commute - Z2',s:[{m:20,h:50,c:Z2,l:'AM Z2'},{m:20,h:50,c:Z2,l:'PM Z2'}],lg:[[Z2,'Z2']]},
+  'tc-d7-wed':{t:'Wed commute - Z2',s:[{m:20,h:50,c:Z2,l:'AM Z2'},{m:20,h:50,c:Z2,l:'PM Z2'}],lg:[[Z2,'Z2']]},
+  'tc-d7-thu':{t:'Thu commute - Z4 blocks PM',s:[{m:20,h:48,c:Z2,l:'AM Z2'},{m:8,h:46,c:Z2,l:'Z2'},{m:22,h:86,c:Z4,l:'Z4 blocks'},{m:6,h:40,c:Z2,l:'Z2'}],lg:[[Z2,'Z2'],[Z4,'Z4']]},
+  'tc-dev-sat2':{t:'Saturday - SS + threshold',s:[{m:15,h:28,c:Z2,l:'WU'},{m:20,h:80,c:Z3,l:'SS 20m'},{m:8,h:34,c:Z2,l:'rec'},{m:12,h:92,c:Z4,l:'THR 12m'},{m:8,h:34,c:Z2,l:'rec'},{m:12,h:80,c:Z3,l:'SS 12m'},{m:10,h:18,c:Z2,l:'CD'}],lg:[[Z3,'SS'],[Z4,'THR 215-230W']]},
+  'tc-dev-run2':{t:'Sunday - tempo 8km',s:[{m:5,h:25,c:Z2,l:'WU'},{m:14,h:45,c:Z2,l:'Easy 3k'},{m:5,h:92,c:Z4,l:'THR 1k'},{m:14,h:45,c:Z2,l:'Easy 3k'},{m:5,h:22,c:Z2,l:'CD'}],lg:[[Z2,'Easy'],[Z4,'1km 5:00/km']]},
+  /* PEAK */
+  'tc-p9-tu':{t:'Tue commute - Z2',s:[{m:20,h:50,c:Z2,l:'AM Z2'},{m:20,h:50,c:Z2,l:'PM Z2'}],lg:[[Z2,'Z2']]},
+  'tc-p9-wed':{t:'Wed commute - Z2 in / Z4 out',s:[{m:20,h:48,c:Z2,l:'AM Z2'},{m:20,h:80,c:Z4,l:'PM Z4 push'}],lg:[[Z2,'Z2'],[Z4,'Z4']]},
+  'tc-p9-thu':{t:'Thu commute - 30 min Z4 PM',s:[{m:20,h:48,c:Z2,l:'AM Z2'},{m:5,h:46,c:Z2,l:'Z2'},{m:30,h:90,c:Z4,l:'Z4 sustained'},{m:5,h:40,c:Z2,l:'Z2'}],lg:[[Z2,'Z2'],[Z4,'Z4 163-170']]},
+  'tc-pk-satA':{t:'Saturday A - 2x20 sweet spot',s:[{m:15,h:28,c:Z2,l:'WU'},{m:12,h:48,c:Z2,l:'Z2'},{m:20,h:84,c:Z3,l:'SS 20m'},{m:10,h:34,c:Z2,l:'rec'},{m:20,h:84,c:Z3,l:'SS 20m'},{m:12,h:40,c:Z2,l:'Z2'},{m:10,h:18,c:Z2,l:'CD'}],lg:[[Z2,'Z2'],[Z3,'SS 205-215W']]},
+  'tc-pk-run':{t:'Sunday - 8-10km + threshold',s:[{m:5,h:25,c:Z2,l:'WU'},{m:12,h:46,c:Z2,l:'Easy'},{m:5,h:95,c:Z4,l:'THR'},{m:8,h:46,c:Z2,l:'Easy'},{m:5,h:95,c:Z4,l:'THR'},{m:12,h:46,c:Z2,l:'Easy'},{m:5,h:22,c:Z2,l:'CD'}],lg:[[Z2,'Easy'],[Z4,'2x1km 5:00/km']]},
+  'tc-p10-tu':{t:'Tue commute - Z2',s:[{m:20,h:50,c:Z2,l:'AM Z2'},{m:20,h:50,c:Z2,l:'PM Z2'}],lg:[[Z2,'Z2']]},
+  'tc-p10-wed':{t:'Wed commute - Z2 in / Z4 out',s:[{m:20,h:48,c:Z2,l:'AM Z2'},{m:20,h:80,c:Z4,l:'PM Z4'}],lg:[[Z2,'Z2'],[Z4,'Z4']]},
+  'tc-p10-thu':{t:'Thu commute - 30 min Z4',s:[{m:20,h:48,c:Z2,l:'AM Z2'},{m:5,h:46,c:Z2,l:'Z2'},{m:30,h:90,c:Z4,l:'Z4'},{m:5,h:40,c:Z2,l:'Z2'}],lg:[[Z2,'Z2'],[Z4,'Z4']]},
+  'tc-pk-satB':{t:'Saturday B - 2x10 threshold',s:[{m:15,h:28,c:Z2,l:'WU'},{m:10,h:48,c:Z2,l:'Z2'},{m:10,h:96,c:Z4,l:'THR 10m'},{m:8,h:32,c:Z2,l:'rec'},{m:10,h:96,c:Z4,l:'THR 10m'},{m:8,h:32,c:Z2,l:'rec'},{m:15,h:80,c:Z3,l:'SS 15m'},{m:12,h:18,c:Z2,l:'CD'}],lg:[[Z3,'SS'],[Z4,'THR 215-240W']]},
+  'tc-pk-run10':{t:'Sunday - steady 8-10km',s:[{m:6,h:28,c:Z2,l:'WU'},{m:40,h:48,c:Z2,l:'Steady'},{m:5,h:22,c:Z2,l:'CD'}],lg:[[Z2,'Steady']]},
+  'tc-pk-ftp':{t:'Week 12 - FTP retest',s:[{m:20,h:28,c:Z2,l:'Warm up'},{m:5,h:60,c:Z3,l:'build'},{m:20,h:100,c:Z5,l:'ALL OUT 20min'},{m:10,h:20,c:Z2,l:'Cool down'}],lg:[[Z5,'All-out - FTP = avg x 0.95']]},
+  /* RECOVERY */
+  'tc-rec-tu':{t:'Tue - easy Z2 by feel',s:[{m:20,h:38,c:Z2,l:'AM Z2'},{m:20,h:38,c:Z2,l:'PM Z2'}],lg:[[Z2,'Z2 by feel']]},
+  'tc-rec-thu':{t:'Thu - easy Z2 by feel',s:[{m:20,h:38,c:Z2,l:'AM Z2'},{m:20,h:38,c:Z2,l:'PM Z2'}],lg:[[Z2,'Z2 by feel']]},
+  'tc-rec-run':{t:'Sunday - easy 5km',s:[{m:28,h:26,c:Z2,l:'Easy 5km'}],lg:[[Z2,'Easy']]}
+};
+function buildChart(id){
+  const sp=CHARTS[id];if(!sp)return;
+  document.querySelectorAll('[data-chart="'+id+'"]').forEach(cont=>{
+    if(cont.dataset.built)return; cont.dataset.built='1';
+    const total=sp.s.reduce((a,x)=>a+x.m,0);
+    const box=document.createElement('div');box.className='tchart';
+    box.innerHTML='<div class="tchart-h"><div class="tchart-t">'+sp.t+'</div><div class="tchart-tm">~'+total+' min</div></div>';
+    const bars=document.createElement('div');bars.className='tchart-bars';
+    sp.s.forEach(s=>{const col=document.createElement('div');col.className='tb-col';col.style.flexGrow=s.m;col.style.flexBasis='0';
+      const bar=document.createElement('div');bar.className='tb-bar';bar.style.background=s.c;bar.style.height=s.h+'%';
+      const lb=document.createElement('div');lb.className='tb-lbl';lb.textContent=s.l;
+      col.appendChild(bar);col.appendChild(lb);bars.appendChild(col);});
+    box.appendChild(bars);
+    if(sp.lg){const lg=document.createElement('div');lg.className='tchart-leg';
+      sp.lg.forEach(l=>{const it=document.createElement('div');it.className='tleg';
+        it.innerHTML='<div class="tleg-d" style="background:'+l[0]+'"></div><span>'+l[1]+'</span>';lg.appendChild(it);});
+      box.appendChild(lg);}
+    cont.appendChild(box);
+  });
+}
+Object.keys(CHARTS).forEach(buildChart);
+
+/* ===== KB PAGE with STATIC SVG diagrams ===== */
+const EX={
+  A:[
+    {name:'Goblet Squat',kit:'Kettlebell',sets:'2 x 40 sec',how:'Hold the KB against your chest with both hands. Feet shoulder-width. Sit down between your hips, keeping your chest tall, until thighs are about parallel. Drive back up through your heels.',cue:'Knees track out over your toes, weight in your heels, chest proud.',why:'Builds the quad and glute strength you push through on every pedal stroke.'},
+    {name:'KB Deadlift',kit:'Kettlebell',sets:'2 x 40 sec',how:'KB on the floor between your feet. Hinge at the hips with a flat back, soft knees, and grip the handle. Stand tall by driving your hips forward, then lower under control.',cue:'Push hips back, not down. Flat back throughout - no rounding.',why:'Trains the glutes and hamstrings, your main source of cycling power.'},
+    {name:'Dead Bug',kit:'Bodyweight',sets:'2 x 40 sec',how:'Lie on your back, arms pointing at the ceiling, knees bent over hips. Slowly lower the opposite arm and leg towards the floor, then return and switch sides.',cue:'Press your lower back flat into the mat the whole time.',why:'Deep core control that stabilises your torso when you push hard on the bike.'},
+    {name:'Glute Bridge',kit:'Optional KB',sets:'2 x 40 sec',how:'Lie on your back, knees bent, feet flat. Rest the KB on your hips (or just use bodyweight). Drive your hips to the ceiling and squeeze your glutes hard at the top, then lower.',cue:'Squeeze the glutes at the top - do not arch your lower back.',why:'Direct hip-extension power and glute activation.'}
+  ],
+  B:[
+    {name:'Single-Leg RDL',kit:'Kettlebell',sets:'3 x 40 sec each leg',how:'Stand on one leg holding the KB in the opposite hand. Hinge forward, letting the free leg float straight back, until your torso is near parallel. Return to standing.',cue:'Hips stay level - imagine balancing a glass of water on your lower back.',why:'Balance plus single-leg posterior-chain strength through a cycling-specific range.'},
+    {name:'Push-Up',kit:'Bodyweight',sets:'3 x 40 sec',how:'Hands under shoulders, body in a straight line. Lower your chest to the mat, elbows about 45 degrees from your body, then press back up. Drop to knees if needed.',cue:'Keep a straight line from head to heels - no sagging hips.',why:'Upper-body and core strength to support your weight on the bars.'},
+    {name:'Reverse Lunge',kit:'Optional KB',sets:'3 x 40 sec each leg',how:'Stand tall (hold the KB at your chest for more load). Step one foot back and lower until both knees are about 90 degrees, then drive back to standing. Alternate or stay on one side.',cue:'Most of your weight stays on the front heel; torso upright.',why:'Single-leg strength and stability - irons out left/right imbalances.'},
+    {name:'Side Plank',kit:'Bodyweight',sets:'3 x 30 sec each side',how:'Lie on your side, forearm under your shoulder. Lift your hips so your body forms a straight line, hold, then switch sides.',cue:'Stack your hips and shoulders; do not let the bottom hip drop.',why:'Lateral core strength that keeps your hips stable in the saddle.'}
+  ],
+  C:[
+    {name:'KB Swing',kit:'Kettlebell',sets:'3 x 45 sec',how:'KB on the floor in front of you. Hinge and hike it back between your legs, then explosively snap your hips forward to swing it up to about chest height. Let it fall back into the next rep.',cue:'Power comes from the hips snapping, not your arms lifting.',why:'The closest gym movement to a cycling power surge - explosive hip drive.'},
+    {name:'KB Clean & Press',kit:'Kettlebell',sets:'3 x 45 sec each side',how:'Clean the KB from the floor to the racked position at your shoulder, then press it overhead. Lower back to the shoulder, then to the floor. Switch sides halfway.',cue:'Keep the wrist straight and the KB close as it travels up.',why:'Full-body explosive power plus shoulder strength.'},
+    {name:'Goblet Squat Pulse',kit:'Kettlebell',sets:'3 x 45 sec',how:'Hold a deep goblet squat and pulse up and down through the bottom few inches of the range, staying low the whole time.',cue:'Stay deep - the work is in holding the bottom position under tension.',why:'Quad endurance for sustained efforts and long climbs.'},
+    {name:'Mountain Climbers',kit:'Bodyweight',sets:'3 x 45 sec',how:'Start in a push-up position. Drive one knee towards your chest, then switch legs quickly, as if running on the spot in a plank.',cue:'Keep hips low and level; quick but controlled.',why:'Cardio plus core under fatigue - trains you to hold form when tired.'}
+  ]
+};
+const CINFO={A:['Circuit A - Foundation','Weeks 1-2 - 2 rounds - 40s on / 20s rest - KB + mat'],B:['Circuit B - Stability','Weeks 3-4 - 3 rounds - 40s on / 20s rest - KB + mat'],C:['Circuit C - Power','Weeks 5-12 - 3 rounds - 45s on / 15s rest - KB + mat']};
+
+/* ===== PER-WEEK TEMPLATE ===== */
+const WEEK_TPL={
+  b1:[['MON','Rest'],['TUE','Commute Z2 + KB A'],['WED','Rest'],['THU','Commute Z2/Z3 + KB A'],['FRI','Rest'],['SAT','Base ride 2h'],['SUN','Run 5km easy']],
+  b2:[['MON','Rest'],['TUE','Commute Z2 + KB A'],['WED','Commute Z2'],['THU','Commute 2x5 Z3 + KB A'],['FRI','Rest'],['SAT','Base ride 2.5h'],['SUN','Run 5km easy']],
+  b3:[['MON','Rest'],['TUE','Commute Z2 + KB B'],['WED','Commute Z2'],['THU','Commute 2x5 Z3 + KB B'],['FRI','Rest'],['SAT','Sweet spot ride'],['SUN','Run 7km easy']],
+  b4:[['MON','Rest'],['TUE','Easy commute'],['WED','Rest'],['THU','Easy commute'],['FRI','Rest'],['SAT','Easy 90min'],['SUN','Run 5km easy']],
+  d5:[['MON','Rest'],['TUE','Commute + KB C'],['WED','Commute Z2'],['THU','Commute Z4 + KB C'],['FRI','Rest'],['SAT','2x20 sweet spot'],['SUN','Run 8km easy']],
+  d6:[['MON','Rest'],['TUE','Commute + KB C'],['WED','Commute Z2'],['THU','Commute Z4 + KB C'],['FRI','Rest'],['SAT','2x20 sweet spot'],['SUN','Run 8km easy']],
+  d7:[['MON','Rest'],['TUE','Commute + KB C'],['WED','Commute Z2'],['THU','Commute Z4 + KB C'],['FRI','Rest'],['SAT','SS + threshold'],['SUN','Run 8km tempo']],
+  d8:[['MON','Rest'],['TUE','Commute + KB C'],['WED','Commute Z2'],['THU','Commute Z4 + KB C'],['FRI','Rest'],['SAT','SS + threshold'],['SUN','Run 8km tempo']],
+  p9:[['MON','Rest'],['TUE','Commute + KB C'],['WED','Commute Z4'],['THU','Commute Z4 + KB C'],['FRI','Rest'],['SAT','2x20 sweet spot'],['SUN','Run 8-10km + THR']],
+  p10:[['MON','Rest'],['TUE','Commute + KB C'],['WED','Commute Z4'],['THU','Commute Z4 + KB C'],['FRI','Rest'],['SAT','2x10 threshold'],['SUN','Run 8-10km']],
+  p11:[['MON','Rest'],['TUE','Commute + KB C'],['WED','Commute Z4'],['THU','Commute Z4 + KB C'],['FRI','Rest'],['SAT','2x20 sweet spot'],['SUN','Run 8-10km + THR']],
+  p12:[['MON','Rest'],['TUE','Commute + KB C'],['WED','Commute Z4'],['THU','Commute Z4 + KB C'],['FRI','Rest'],['SAT','FTP TEST 20min'],['SUN','Run easy']],
+  r13:[['MON','Rest'],['TUE','Easy ride'],['WED','Rest'],['THU','Easy ride'],['FRI','Rest'],['SAT','Rest'],['SUN','Run 5km easy']]
+};
+function renderTemplate(wk){
+  const tpl=WEEK_TPL[wk];if(!tpl)return;
+  const el=document.getElementById('wtbl');if(!el)return;
+  el.innerHTML=tpl.map(r=>'<div class="wt d">'+r[0]+'</div><div class="wt">'+r[1]+'</div>').join('');
+}
+
+
+/* ===== CIRCUIT PLAYER ENGINE (smooth rAF) ===== */
+var PLAYER={};
+function initPlayer(id){
+  var cards=document.querySelectorAll('#ctrack-'+id+' .exrow');
+  var ex=[];
+  cards.forEach(function(c){ex.push({work:+c.dataset.work,rest:+c.dataset.rest,rounds:+c.dataset.rounds});});
+  PLAYER[id]={ex:ex,cur:0,phase:'idle',roundLeft:ex[0].rounds,timeLeft:ex[0].work,segLen:ex[0].work,
+              running:false,raf:null,last:0,n:ex.length,elapsed:0};
+  buildTimeline(id);
+  renderCard(id);
+  updateCircuitBar(id);
+}
+function setTrack(id){
+  var p=PLAYER[id];
+  document.getElementById('ctrack-'+id).style.transform='translateX(-'+(p.cur*100)+'%)';
+  var dots=document.querySelectorAll('#cdots-'+id+' .cdot');
+  dots.forEach(function(d,i){d.classList.toggle('active',i===p.cur);});
+}
+function renderCard(id){
+  var p=PLAYER[id];setTrack(id);
+  p.ex.forEach(function(_,i){document.getElementById('card-'+id+'-'+i).classList.toggle('active',i===p.cur);});
+  var i=p.cur;
+  var ph=document.getElementById('ph-'+id+'-'+i),ct=document.getElementById('ct-'+id+'-'+i),sl=document.getElementById('sl-'+id+'-'+i);
+  if(ph){
+    if(p.phase==='idle'){ph.textContent='READY';ph.style.color='var(--mut)';}
+    else if(p.phase==='work'){ph.textContent='WORK';ph.style.color='var(--cy)';}
+    else if(p.phase==='rest'){ph.textContent='REST';ph.style.color='var(--ok)';}
+    else if(p.phase==='pause'){ph.textContent='NEXT UP';ph.style.color='var(--kb)';}
+    ct.textContent=Math.ceil(p.timeLeft);
+    sl.textContent=p.roundLeft;
+  }
+  drawBorder(id);
+}
+function borderColor(phase){return phase==='work'?'var(--cy)':phase==='rest'?'var(--ok)':phase==='pause'?'var(--kb)':'var(--brd)';}
+function drawBorder(id){
+  var p=PLAYER[id];var i=p.cur;var b=document.getElementById('bord-'+id+'-'+i);if(!b)return;
+  var frac=p.segLen>0?Math.max(0,Math.min(1,p.timeLeft/p.segLen)):0;
+  var deg=frac*360;
+  var col=borderColor(p.phase);
+  b.style.background='conic-gradient('+col+' '+deg+'deg, rgba(255,255,255,0.06) '+deg+'deg)';
+  b.style.opacity=(p.phase==='idle')?0:1;
+}
+/* advance phase logic when a segment elapses */
+function advance(id){
+  var p=PLAYER[id];
+  if(p.phase==='work'){
+    p.roundLeft--;
+    if(p.roundLeft<=0){
+      if(p.cur<p.n-1){
+        p.cur++;p.phase='pause';p.segLen=5;p.timeLeft=5;p.roundLeft=p.ex[p.cur].rounds;
+        if(navigator.vibrate)navigator.vibrate([100,50,100]);
+      } else {finishCircuit(id);return false;}
+    } else {
+      p.phase='rest';p.segLen=p.ex[p.cur].rest;p.timeLeft=p.ex[p.cur].rest;
+      if(navigator.vibrate)navigator.vibrate(80);
+    }
+  } else if(p.phase==='rest'){
+    p.phase='work';p.segLen=p.ex[p.cur].work;p.timeLeft=p.ex[p.cur].work;
+    if(navigator.vibrate)navigator.vibrate([120,60,120]);
+  } else if(p.phase==='pause'){
+    p.phase='work';p.segLen=p.ex[p.cur].work;p.timeLeft=p.ex[p.cur].work;
+    if(navigator.vibrate)navigator.vibrate([120,60,120]);
+  }
+  return true;
+}
+function loop(id,ts){
+  var p=PLAYER[id];if(!p.running)return;
+  if(!p.last)p.last=ts;
+  var dt=(ts-p.last)/1000;p.last=ts;
+  p.timeLeft-=dt;p.elapsed=(p.elapsed||0)+dt;
+  while(p.timeLeft<=0 && p.running){
+    var carry=-p.timeLeft;
+    if(!advance(id)){return;}
+    p.timeLeft-=carry; // carry remainder into next segment
+  }
+  renderCard(id);updateCircuitBar(id);
+  p.raf=requestAnimationFrame(function(t){loop(id,t);});
+}
+function finishCircuit(id){
+  var p=PLAYER[id];cancelAnimationFrame(p.raf);p.running=false;p.phase='idle';
+  document.getElementById('pgo-'+id).textContent='Done \u2713';
+  var ph=document.getElementById('ph-'+id+'-'+p.cur);if(ph){ph.textContent='COMPLETE';ph.style.color='var(--ok)';}
+  movePlayhead(id,100);
+  document.querySelectorAll('#cdots-'+id+' .cdot').forEach(function(d){d.classList.add('done');});
+  if(navigator.vibrate)navigator.vibrate([200,80,200,80,200]);
+  releaseWake();
+}
+function pToggle(id){
+  var p=PLAYER[id];var go=document.getElementById('pgo-'+id);
+  if(p.running){cancelAnimationFrame(p.raf);p.running=false;p.last=0;go.textContent='Resume';go.classList.remove('go');releaseWake();}
+  else{
+    if(p.phase==='idle'){p.phase='work';p.segLen=p.ex[p.cur].work;p.timeLeft=p.ex[p.cur].work;}
+    p.running=true;p.last=0;go.textContent='Pause';go.classList.add('go');requestWake();
+    renderCard(id);
+    p.raf=requestAnimationFrame(function(t){loop(id,t);});
+  }
+}
+function pReset(id){
+  var p=PLAYER[id];cancelAnimationFrame(p.raf);
+  p.cur=0;p.phase='idle';p.running=false;p.last=0;p.elapsed=0;p.roundLeft=p.ex[0].rounds;p.timeLeft=p.ex[0].work;p.segLen=p.ex[0].work;
+  document.getElementById('pgo-'+id).textContent='Start';document.getElementById('pgo-'+id).classList.add('go');
+  document.querySelectorAll('#cdots-'+id+' .cdot').forEach(function(d){d.classList.remove('done');});
+  renderCard(id);updateCircuitBar(id);releaseWake();
+}
+function pGoto(id,idx){
+  var p=PLAYER[id];if(idx<0||idx>=p.n)return;cancelAnimationFrame(p.raf);
+  p.cur=idx;p.phase='idle';p.running=false;p.last=0;p.roundLeft=p.ex[idx].rounds;p.timeLeft=p.ex[idx].work;p.segLen=p.ex[idx].work;var el=0;for(var k=0;k<idx;k++){var ee=p.ex[k];el+=ee.rounds*ee.work+(ee.rounds-1)*ee.rest+5;}p.elapsed=el;
+  document.getElementById('pgo-'+id).textContent='Start';document.getElementById('pgo-'+id).classList.add('go');
+  renderCard(id);updateCircuitBar(id);
+}
+function pNext(id){pGoto(id,PLAYER[id].cur+1);}
+function pPrev(id){pGoto(id,PLAYER[id].cur-1);}
+function attachSwipe(id){
+  var deck=document.querySelector('#ctrack-'+id).parentNode;
+  var sx=0,dx=0,drag=false;
+  deck.addEventListener('touchstart',function(e){sx=e.touches[0].clientX;dx=0;drag=true;},{passive:true});
+  deck.addEventListener('touchmove',function(e){if(drag)dx=e.touches[0].clientX-sx;},{passive:true});
+  deck.addEventListener('touchend',function(){if(!drag)return;drag=false;if(Math.abs(dx)>40){if(dx<0)pNext(id);else pPrev(id);}});
+}
+/* ---- TIMELINE: full circuit as coloured blocks + smooth playhead ---- */
+function circuitSegments(id){
+  // returns array of {dur,phase} for the whole circuit at full set count
+  var p=PLAYER[id],segs=[];
+  p.ex.forEach(function(e,i){
+    for(var r=0;r<e.rounds;r++){
+      segs.push({dur:e.work,phase:'work'});
+      if(r<e.rounds-1)segs.push({dur:e.rest,phase:'rest'});
+    }
+    if(i<p.n-1)segs.push({dur:5,phase:'pause'});
+  });
+  return segs;
+}
+function buildTimeline(id){
+  var segs=circuitSegments(id);
+  var total=segs.reduce(function(a,s){return a+s.dur;},0);
+  PLAYER[id].segs=segs;PLAYER[id].total=total;
+  var bar=document.getElementById('cbf-'+id);
+  // build coloured blocks
+  var html='';
+  segs.forEach(function(s){
+    var col=s.phase==='work'?'var(--cy)':s.phase==='rest'?'var(--ok)':'var(--kb)';
+    html+='<div style="flex:'+s.dur+';background:'+col+';opacity:.85"></div>';
+  });
+  bar.innerHTML=html;
+}
+function elapsedSoFar(id){return PLAYER[id].elapsed||0;}
+function movePlayhead(id,pctOverride){
+  var p=PLAYER[id];
+  var ph=document.getElementById('cph-'+id);if(!ph)return;
+  var pct=(pctOverride!==undefined)?pctOverride:(p.total>0?(elapsedSoFar(id)/p.total*100):0);
+  pct=Math.max(0,Math.min(100,pct));
+  ph.style.left=pct+'%';
+}
+function updateCircuitBar(id){
+  var p=PLAYER[id];
+  movePlayhead(id);
+  var totalWork=0,doneWork=0;
+  p.ex.forEach(function(e,i){totalWork+=e.rounds;if(i<p.cur)doneWork+=e.rounds;else if(i===p.cur)doneWork+=(e.rounds-p.roundLeft);});
+  document.getElementById('cbt-'+id).textContent=doneWork+' / '+totalWork+' intervals';
+}
+/* ---- SCREEN WAKE LOCK ---- */
+var _wake=null;
+function requestWake(){
+  try{ if('wakeLock' in navigator){ navigator.wakeLock.request('screen').then(function(w){_wake=w;}).catch(function(){}); } }catch(e){}
+}
+function releaseWake(){
+  // only release if no circuit running
+  var anyRunning=Object.keys(PLAYER).some(function(k){return PLAYER[k].running;});
+  if(!anyRunning && _wake){try{_wake.release();}catch(e){}_wake=null;}
+}
+document.addEventListener('visibilitychange',function(){
+  if(document.visibilityState==='visible'){
+    var anyRunning=Object.keys(PLAYER).some(function(k){return PLAYER[k].running;});
+    if(anyRunning)requestWake();
+  }
+});
+
+function parseWork(sets){var m=sets.match(/(\d+)\s*sec/);return m?parseInt(m[1]):40;}
+function parseRounds(sets){var m=sets.match(/^(\d+)\s*x/);return m?parseInt(m[1]):2;}
+function buildKB(){
+  var cont=document.getElementById('kb-cont');
+  ['A','B','C'].forEach(function(id){
+    var info=CINFO[id];
+    var restSec=id==='C'?15:20;
+    var wrap=document.createElement('div');wrap.className='kb-cw';
+    var hdr=document.createElement('div');hdr.className='kct-hd';hdr.setAttribute('onclick','toggleKCT(this)');
+    hdr.innerHTML='<div><div class="kct-nm">'+info[0]+'</div><div class="kct-sb">'+info[1]+'</div></div><span class="chv" style="color:var(--kb)">\u2304</span>';
+    wrap.appendChild(hdr);
+    var body=document.createElement('div');body.className='kct-bd';body.id='kct-'+id;wrap.appendChild(body);
+    cont.appendChild(wrap);
+
+    // PLAYER
+    var player=document.createElement('div');player.className='player';
+    var deck=document.createElement('div');deck.className='cdeck';
+    var track=document.createElement('div');track.className='ctrack';track.id='ctrack-'+id;
+    EX[id].forEach(function(e,i){
+      var work=parseWork(e.sets),rounds=parseRounds(e.sets);
+      var slide=document.createElement('div');slide.className='cslide';
+      var kitCls=e.kit==='Bodyweight'?'exkit bw':'exkit';
+      var card=document.createElement('div');card.className='exrow';card.id='card-'+id+'-'+i;
+      card.setAttribute('data-work',work);card.setAttribute('data-rest',restSec);card.setAttribute('data-rounds',rounds);
+      card.innerHTML=
+        '<div class="exborder" id="bord-'+id+'-'+i+'"></div>'+
+        '<div class="exrow-head"><span class="exnum">'+(i+1)+'</span><span class="exnm">'+e.name+'</span><span class="'+kitCls+'">'+e.kit+'</span></div>'+
+        '<div class="exbody">'+
+          '<div class="exlive"><span class="exlive-ph" id="ph-'+id+'-'+i+'" style="color:var(--mut)">READY</span>'+
+            '<span class="exlive-ct" id="ct-'+id+'-'+i+'">'+work+'</span>'+
+            '<span class="exlive-sets">work left <b id="sl-'+id+'-'+i+'">'+rounds+'</b></span></div>'+
+          '<div class="exsets">'+e.sets+'</div>'+
+          '<div class="exhow">'+e.how+'</div>'+
+          '<div class="excue"><b>Form cue:</b> '+e.cue+'</div>'+
+          '<div class="exwhy">Why it helps: '+e.why+'</div>'+
+        '</div>';
+      slide.appendChild(card);track.appendChild(slide);
+    });
+    deck.appendChild(track);player.appendChild(deck);
+
+    // dots
+    var dots=document.createElement('div');dots.className='cdots';dots.id='cdots-'+id;
+    EX[id].forEach(function(_,i){var d=document.createElement('div');d.className='cdot'+(i===0?' active':'');dots.appendChild(d);});
+    player.appendChild(dots);
+
+    // whole-circuit bar
+    var bw=document.createElement('div');bw.className='cbar-wrap';
+    bw.innerHTML='<div class="cbar-lbl"><span>Circuit timeline</span><span id="cbt-'+id+'"></span></div>'+
+      '<div class="cbar"><div class="cbar-fill" id="cbf-'+id+'"></div><div class="cbar-head" id="cph-'+id+'"></div></div>'+
+      '<div class="cbar-leg"><span class="tleg"><span class="tleg-d" style="background:var(--cy)"></span>work</span>'+
+      '<span class="tleg"><span class="tleg-d" style="background:var(--ok)"></span>rest</span>'+
+      '<span class="tleg"><span class="tleg-d" style="background:var(--kb)"></span>5s pause</span></div>';
+    player.appendChild(bw);
+
+    // controls
+    var btns=document.createElement('div');btns.className='cbtns';
+    btns.innerHTML=
+      '<button class="cbtn nav" onclick="pPrev(\''+id+'\')">&#8249;</button>'+
+      '<button class="cbtn go" id="pgo-'+id+'" onclick="pToggle(\''+id+'\')">Start</button>'+
+      '<button class="cbtn nav" onclick="pNext(\''+id+'\')">&#8250;</button>'+
+      '<button class="cbtn" onclick="pReset(\''+id+'\')">Reset</button>';
+    player.appendChild(btns);
+    var hint=document.createElement('div');hint.className='chint';hint.textContent='swipe cards or use \u2039 \u203a \u00b7 auto-advances when each exercise is done';
+    player.appendChild(hint);
+
+    body.appendChild(player);
+    initPlayer(id);
+  });
+}
+buildKB();
+['A','B','C'].forEach(attachSwipe);
+updateZones('build');
+renderTemplate('b1');
+
+</script>
+</body>
+</html>
